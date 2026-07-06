@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShopVerse - Tienda Virtual</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- Tippy.js para Tooltips -->
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://unpkg.com/tippy.js@6"></script>
+    <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/animations/shift-away.css" />
+    
+    <!-- Estilos personalizados -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    
+    <!-- ==================== HEADER / NAVBAR ==================== -->
+    <header class="sticky top-0 z-50 shadow-lg">
+        <nav class="bg-gradient-to-r from-blue-600 via-blue-500 to-purple-600 text-white px-4 py-3">
+            <div class="container mx-auto flex flex-wrap items-center justify-between">
+                
+                <!-- Logo -->
+                <a href="#" class="flex items-center space-x-2 text-2xl font-bold">
+                    <i class="fas fa-store-alt"></i>
+                    <span>ShopVerse</span>
+                </a>
+                
+                <!-- Buscador Desktop -->
+                <div class="flex-1 max-w-md mx-4 hidden md:block">
+                    <div class="relative">
+                        <input type="text" id="buscador" placeholder="Buscar productos..." 
+                               class="w-full px-4 py-2 rounded-full text-gray-800 focus:outline-none focus:ring-2 focus:ring-purple-300">
+                        <i class="fas fa-search absolute right-3 top-3 text-gray-500"></i>
+                    </div>
+                </div>
+                
+                <!-- Iconos de navegación -->
+                <div class="flex items-center space-x-4">
+                    <button id="btn-categorias" class="hover:text-purple-200 transition relative group">
+                        <i class="fas fa-th-large text-xl"></i>
+                        <span class="tooltip-text">Categorías</span>
+                    </button>
+                    <button id="btn-carrito" class="hover:text-purple-200 transition relative group">
+                        <i class="fas fa-shopping-cart text-xl"></i>
+                        <span class="tooltip-text">Carrito</span>
+                        <span id="contador-carrito" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5">0</span>
+                    </button>
+                    <button id="btn-perfil" class="hover:text-purple-200 transition relative group">
+                        <i class="fas fa-user-circle text-xl"></i>
+                        <span class="tooltip-text">Mi Perfil</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Buscador móvil -->
+            <div class="md:hidden mt-2">
+                <div class="relative">
+                    <input type="text" id="buscador-movil" placeholder="Buscar productos..." 
+                           class="w-full px-4 py-2 rounded-full text-gray-800 focus:outline-none focus:ring-2 focus:ring-purple-300">
+                    <i class="fas fa-search absolute right-3 top-3 text-gray-500"></i>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- ==================== CATEGORÍAS (Modal) ==================== -->
+    <div id="modal-categorias" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center modal-overlay">
+        <div class="bg-white rounded-2xl p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                    <i class="fas fa-th-large mr-2"></i>Categorías
+                </h2>
+                <button onclick="cerrarModal('modal-categorias')" class="text-gray-500 hover:text-gray-700 text-2xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="lista-categorias">
+                <!-- Generado por JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== DETALLE DEL PRODUCTO (Modal) ==================== -->
+    <div id="modal-detalle" class="fixed inset-0 bg-black bg-opacity-60 z-50 hidden flex items-center justify-center modal-overlay">
+        <div class="bg-white rounded-2xl p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto modal-content">
+            <div class="flex justify-between items-start mb-4 sticky top-0 bg-white z-10 pb-2">
+                <h2 id="detalle-titulo" class="text-2xl font-bold text-gray-800"></h2>
+                <button onclick="cerrarModal('modal-detalle')" class="text-gray-500 hover:text-gray-700 text-2xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="detalle-contenido" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Generado por JS -->
+            </div>
+            
+            <!-- SECCIÓN DE RESEÑAS -->
+            <div class="mt-6 border-t pt-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold text-gray-800">
+                        <i class="fas fa-comments text-purple-600 mr-2"></i>Reseñas 
+                        <span id="detalle-reviews-count" class="text-sm text-gray-500 font-normal"></span>
+                    </h3>
+                    <button id="btn-agregar-reseña" 
+                            class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-xl hover:shadow-lg transition text-sm flex items-center gap-2">
+                        <i class="fas fa-pen"></i> Escribir reseña
+                    </button>
+                </div>
+                <div id="detalle-reseñas" class="space-y-3 max-h-60 overflow-y-auto">
+                    <!-- Generado por JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== PRODUCTOS ==================== -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Filtros rápidos -->
+        <div class="flex flex-wrap gap-2 mb-6 justify-center" id="filtros-rapidos">
+            <!-- Generado por JS -->
+        </div>
+        
+        <!-- Grid de productos -->
+        <div id="productos-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <!-- Generado por JS -->
+        </div>
+    </main>
+
+    <!-- ==================== CARRITO (Modal) ==================== -->
+    <div id="modal-carrito" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center modal-overlay">
+        <div class="bg-white rounded-2xl p-6 max-w-2xl w-full mx-4 max-h-[90vh] flex flex-col modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                    <i class="fas fa-shopping-cart mr-2"></i>Mi Carrito
+                </h2>
+                <button onclick="cerrarModal('modal-carrito')" class="text-gray-500 hover:text-gray-700 text-2xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="carrito-contenido" class="flex-1 overflow-y-auto">
+                <!-- Generado por JS -->
+            </div>
+            
+            <!-- SECCIÓN DE CUPONES -->
+            <div class="border-t pt-4 mt-4">
+                <div class="flex flex-col sm:flex-row gap-2 mb-4">
+                    <div class="flex-1 flex gap-2">
+                        <input type="text" id="input-cupon" placeholder="Código de cupón" 
+                               class="cupon-input flex-1 px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        <button onclick="aplicarCupon(document.getElementById('input-cupon').value)" 
+                                class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-xl hover:shadow-lg transition">
+                            <i class="fas fa-ticket-alt"></i> Aplicar
+                        </button>
+                    </div>
+                    <button onclick="mostrarCuponesDisponibles()" 
+                            class="text-purple-600 hover:text-purple-800 transition text-sm flex items-center gap-1">
+                        <i class="fas fa-gift"></i> Ver cupones
+                    </button>
+                </div>
+                
+                <div id="cupon-aplicado-info" class="hidden cupon-aplicado p-3 rounded-xl mb-4 flex items-center justify-between">
+                    <div>
+                        <span class="font-semibold text-purple-700">🎯 Cupón aplicado</span>
+                        <p id="cupon-descripcion" class="text-sm text-gray-600"></p>
+                    </div>
+                    <button onclick="eliminarCupon()" class="text-red-500 hover:text-red-700 transition">
+                        <i class="fas fa-times-circle"></i>
+                    </button>
+                </div>
+                
+                <div class="flex justify-between text-xl font-bold mb-4">
+                    <span>Total:</span>
+                    <div class="text-right">
+                        <span id="carrito-total" class="text-purple-600"></span>
+                        <span id="carrito-total-con-cupon" class="hidden text-green-600 ml-2"></span>
+                    </div>
+                </div>
+                <button onclick="finalizarCompra()" class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl hover:shadow-lg transition transform hover:scale-105">
+                    <i class="fas fa-check mr-2"></i>Finalizar Compra
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== PERFIL (Modal) ==================== -->
+    <div id="modal-perfil" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center modal-overlay">
+        <div class="bg-white rounded-2xl p-6 max-w-md w-full mx-4 modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                    <i class="fas fa-user-circle mr-2"></i>Mi Perfil
+                </h2>
+                <button onclick="cerrarModal('modal-perfil')" class="text-gray-500 hover:text-gray-700 text-2xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="text-center">
+                <div class="w-24 h-24 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full mx-auto flex items-center justify-center text-4xl text-white mb-4 shadow-lg">
+                    <i class="fas fa-user"></i>
+                </div>
+                <h3 class="text-xl font-bold">Usuario Demo</h3>
+                <p class="text-gray-500">usuario@shopverse.com</p>
+                
+                <div class="mt-6 space-y-2">
+                    <!-- Mis compras con > -->
+                    <button class="perfil-opcion">
+                        <i class="fas fa-history icono"></i>
+                        <span class="texto">Mis compras</span>
+                        <i class="fas fa-chevron-right flecha"></i>
+                    </button>
+                    
+                    <!-- Favoritos con > -->
+                    <button class="perfil-opcion">
+                        <i class="fas fa-heart icono"></i>
+                        <span class="texto">Favoritos</span>
+                        <i class="fas fa-chevron-right flecha"></i>
+                    </button>
+                    
+                    <!-- Configuración con > -->
+                    <button class="perfil-opcion">
+                        <i class="fas fa-cog icono"></i>
+                        <span class="texto">Configuración</span>
+                        <i class="fas fa-chevron-right flecha"></i>
+                    </button>
+                    
+                    <!-- Cerrar sesión con > (rojo) -->
+                    <button class="perfil-opcion danger">
+                        <i class="fas fa-sign-out-alt icono"></i>
+                        <span class="texto">Cerrar sesión</span>
+                        <i class="fas fa-chevron-right flecha"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== FOOTER ==================== -->
+    <footer class="bg-gradient-to-r from-blue-600 via-blue-500 to-purple-600 text-white mt-12">
+        <div class="container mx-auto px-4 py-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
+                <div>
+                    <h3 class="font-bold text-xl mb-2 flex items-center justify-center md:justify-start gap-2">
+                        <i class="fas fa-store-alt"></i> ShopVerse
+                    </h3>
+                    <p class="text-blue-100">Tu tienda virtual favorita</p>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-2">Enlaces</h4>
+                    <ul class="space-y-1 text-blue-100">
+                        <li><a href="#" class="hover:text-white transition">Términos y condiciones</a></li>
+                        <li><a href="#" class="hover:text-white transition">Política de privacidad</a></li>
+                        <li><a href="#" class="hover:text-white transition">Centro de ayuda</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-2">Síguenos</h4>
+                    <div class="flex justify-center md:justify-start space-x-4">
+                        <a href="#" class="text-2xl hover:text-purple-200 transition transform hover:scale-110"><i class="fab fa-facebook"></i></a>
+                        <a href="#" class="text-2xl hover:text-purple-200 transition transform hover:scale-110"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-2xl hover:text-purple-200 transition transform hover:scale-110"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-2xl hover:text-purple-200 transition transform hover:scale-110"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-blue-400 mt-6 pt-6 text-center text-blue-100">
+                <p>&copy; 2026 ShopVerse. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ==================== SCRIPTS (ORDEN CORRECTO) ==================== -->
+    <script src="js/productos.js"></script>
+    <script src="js/carrito.js"></script>
+    <script src="js/cupones.js"></script>
+    <script src="js/reseñas.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
