@@ -1,0 +1,336 @@
+/* ==================== ESTILOS PERSONALIZADOS ==================== */
+
+/* ===== OCULTAR SCROLL DEL NAVEGADOR ===== */
+html {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+}
+html::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    background: transparent !important;
+}
+
+/* ===== OCULTAR SCROLL DE SWEETALERT - FORMA DEFINITIVA ===== */
+/* Para todos los navegadores */
+.swal2-popup,
+.swal2-container,
+.swal2-modal,
+.swal2-html-container {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+    overflow: -moz-scrollbars-none !important;
+}
+
+.swal2-popup::-webkit-scrollbar,
+.swal2-container::-webkit-scrollbar,
+.swal2-modal::-webkit-scrollbar,
+.swal2-html-container::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    background: transparent !important;
+    -webkit-appearance: none !important;
+}
+
+/* Forzar overflow hidden en SweetAlert */
+.swal2-popup {
+    overflow: hidden !important;
+}
+
+.swal2-html-container {
+    overflow: hidden !important;
+    max-height: none !important;
+}
+
+/* Clase para ocultar scroll en cualquier elemento */
+.no-scroll {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+    overflow: -moz-scrollbars-none !important;
+}
+.no-scroll::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    background: transparent !important;
+}
+
+/* SweetAlert sin scroll */
+.swal2-no-scroll {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+    overflow: hidden !important;
+}
+.swal2-no-scroll::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+}
+
+.swal2-no-scroll-container {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+    overflow: hidden !important;
+}
+.swal2-no-scroll-container::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+}
+
+/* ===== OCULTAR SCROLL DE MODALES ===== */
+.modal-content {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+    overflow: -moz-scrollbars-none !important;
+}
+.modal-content::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    background: transparent !important;
+}
+
+/* ===== TOOLTIPS CON BORDE NEGRO ===== */
+.tippy-box {
+    background: linear-gradient(to right, #3b82f6, #9333ea) !important;
+    color: white !important;
+    font-weight: 600 !important;
+    padding: 8px 18px !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4) !important;
+    border: 2px solid #1a1a1a !important;
+    font-size: 0.85rem !important;
+}
+.tippy-arrow {
+    color: #7c3aed !important;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+/* ===== TOOLTIPS NATIVOS ===== */
+.tooltip-text {
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.85);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    border: 1px solid #4a4a4a;
+}
+.group:hover .tooltip-text {
+    opacity: 1;
+    bottom: -34px;
+}
+
+/* ===== ANIMACIONES ===== */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(30px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes scaleIn {
+    from { transform: scale(0.8) rotate(-2deg); opacity: 0; }
+    to { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== PRODUCTOS ===== */
+.producto-card {
+    animation: fadeIn 0.6s ease forwards;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(59, 130, 246, 0.1);
+}
+.producto-card:hover {
+    transform: translateY(-8px) scale(1.01);
+    box-shadow: 0 20px 40px rgba(59, 130, 246, 0.2), 0 10px 20px rgba(147, 51, 234, 0.15);
+    border-color: rgba(147, 51, 234, 0.3);
+}
+.producto-card .producto-imagen {
+    transition: transform 0.5s ease;
+}
+.producto-card:hover .producto-imagen {
+    transform: scale(1.05);
+}
+
+/* ===== BOTONES DE FILTRO ===== */
+.filtro-btn {
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+.filtro-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+.filtro-btn.active {
+    background: linear-gradient(to right, #3b82f6, #9333ea);
+    color: white;
+    border-color: #9333ea;
+    box-shadow: 0 4px 15px rgba(147, 51, 234, 0.4);
+}
+.filtro-btn.active:hover {
+    transform: translateY(-2px) scale(1.02);
+}
+
+/* ===== CARRITO ===== */
+.carrito-item {
+    border-bottom: 1px solid #e5e7eb;
+    padding: 16px 0;
+    transition: all 0.3s ease;
+}
+.carrito-item:hover {
+    background: linear-gradient(to right, rgba(59, 130, 246, 0.05), rgba(147, 51, 234, 0.05));
+    padding-left: 8px;
+    border-radius: 8px;
+}
+.carrito-item:last-child {
+    border-bottom: none;
+}
+
+/* ===== BADGES ===== */
+.oferta-badge {
+    background: linear-gradient(to right, #ef4444, #dc2626);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    animation: pulse 2s infinite;
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+}
+.rating-badge {
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(4px);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+/* ===== MODALES ===== */
+.modal-content {
+    animation: scaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.modal-overlay {
+    backdrop-filter: blur(4px);
+}
+
+/* ===== CUPONES ===== */
+.cupon-input {
+    border: 2px dashed #9333ea;
+    transition: all 0.3s ease;
+}
+.cupon-input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+.cupon-aplicado {
+    background: linear-gradient(to right, #dbeafe, #ede9fe);
+    border: 2px solid #7c3aed;
+    animation: slideDown 0.3s ease;
+}
+
+/* ===== RESEÑAS ===== */
+.reseña-item {
+    animation: slideDown 0.3s ease;
+    border-left: 4px solid #7c3aed;
+    padding-left: 16px;
+    margin-bottom: 12px;
+}
+.reseña-item:hover {
+    background: linear-gradient(to right, rgba(59, 130, 246, 0.05), rgba(147, 51, 234, 0.05));
+    border-radius: 8px;
+    padding-left: 20px;
+}
+.star-rating-input {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.star-rating-input:hover {
+    transform: scale(1.2);
+}
+
+/* ===== PERFIL ===== */
+.perfil-opcion {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    color: #1f2937;
+}
+.perfil-opcion:hover {
+    background: linear-gradient(to right, rgba(59, 130, 246, 0.08), rgba(147, 51, 234, 0.08));
+}
+.perfil-opcion .flecha {
+    color: #9ca3af;
+    transition: all 0.3s ease;
+}
+.perfil-opcion:hover .flecha {
+    color: #7c3aed;
+    transform: translateX(4px);
+}
+.perfil-opcion .icono {
+    width: 24px;
+    color: #3b82f6;
+}
+.perfil-opcion .texto {
+    flex: 1;
+    margin-left: 12px;
+    text-align: left;
+}
+.perfil-opcion.danger:hover {
+    background: linear-gradient(to right, rgba(239, 68, 68, 0.08), rgba(239, 68, 68, 0.05));
+}
+.perfil-opcion.danger .icono {
+    color: #ef4444;
+}
+.perfil-opcion.danger:hover .icono {
+    color: #dc2626;
+}
+
+/* ===== UTILIDADES ===== */
+.btn-danger {
+    transition: all 0.3s ease;
+}
+.btn-danger:hover {
+    transform: scale(1.1);
+    color: #dc2626;
+}
+.estrellas .vacia {
+    color: #d1d5db;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 640px) {
+    .producto-card {
+        animation: fadeIn 0.4s ease forwards;
+    }
+    .modal-content {
+        margin: 12px;
+        border-radius: 16px;
+    }
+    .tooltip-text {
+        display: none;
+    }
+}
+
