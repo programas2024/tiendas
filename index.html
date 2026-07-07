@@ -211,55 +211,62 @@
     </div>
 
     <!-- ==================== PERFIL (Modal) ==================== -->
-    <div id="modal-perfil" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center modal-overlay">
-        <div class="bg-white rounded-2xl p-6 max-w-md w-full mx-4 modal-content">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                    <i class="fas fa-user-circle mr-2"></i>Mi Perfil
-                </h2>
-                <button onclick="cerrarModal('modal-perfil')" class="text-gray-500 hover:text-gray-700 text-2xl">
-                    <i class="fas fa-times"></i>
-                </button>
+<div id="modal-perfil" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center modal-overlay">
+    <div class="bg-white rounded-2xl p-6 max-w-md w-full mx-4 modal-content">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                <i class="fas fa-user-circle mr-2"></i>Mi Perfil
+            </h2>
+            <button onclick="cerrarModal('modal-perfil')" class="text-gray-500 hover:text-gray-700 text-2xl">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="text-center">
+            <div class="w-24 h-24 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full mx-auto flex items-center justify-center text-4xl text-white mb-4 shadow-lg">
+                <i class="fas fa-user"></i>
             </div>
-            <div class="text-center">
-                <div class="w-24 h-24 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full mx-auto flex items-center justify-center text-4xl text-white mb-4 shadow-lg">
-                    <i class="fas fa-user"></i>
-                </div>
-                <h3 class="text-xl font-bold">Usuario Demo</h3>
-                <p class="text-gray-500">usuario@shopverse.com</p>
+            <h3 class="text-xl font-bold">Usuario Demo</h3>
+            <p class="text-gray-500">usuario@shopverse.com</p>
+            
+            <div class="mt-6 space-y-2">
+                <!-- Mis compras con > -->
+                <button class="perfil-opcion">
+                    <i class="fas fa-history icono"></i>
+                    <span class="texto">Mis compras</span>
+                    <i class="fas fa-chevron-right flecha"></i>
+                </button>
                 
-                <div class="mt-6 space-y-2">
-                    <!-- Mis compras con > -->
-                    <button class="perfil-opcion">
-                        <i class="fas fa-history icono"></i>
-                        <span class="texto">Mis compras</span>
-                        <i class="fas fa-chevron-right flecha"></i>
-                    </button>
-                    
-                    <!-- Favoritos con > -->
-                    <button class="perfil-opcion">
-                        <i class="fas fa-heart icono"></i>
-                        <span class="texto">Favoritos</span>
-                        <i class="fas fa-chevron-right flecha"></i>
-                    </button>
-                    
-                    <!-- Configuración con > -->
-                    <button class="perfil-opcion">
-                        <i class="fas fa-cog icono"></i>
-                        <span class="texto">Configuración</span>
-                        <i class="fas fa-chevron-right flecha"></i>
-                    </button>
-                    
-                    <!-- Cerrar sesión con > (rojo) -->
-                    <button class="perfil-opcion danger">
-                        <i class="fas fa-sign-out-alt icono"></i>
-                        <span class="texto">Cerrar sesión</span>
-                        <i class="fas fa-chevron-right flecha"></i>
-                    </button>
-                </div>
+                <!-- Favoritos con > -->
+                <button class="perfil-opcion">
+                    <i class="fas fa-heart icono"></i>
+                    <span class="texto">Favoritos</span>
+                    <i class="fas fa-chevron-right flecha"></i>
+                </button>
+                
+                <!-- Configuración con > -->
+                <button class="perfil-opcion">
+                    <i class="fas fa-cog icono"></i>
+                    <span class="texto">Configuración</span>
+                    <i class="fas fa-chevron-right flecha"></i>
+                </button>
+                
+                <!-- Soporte con > (nuevo) -->
+                <a href="soporte.html" class="perfil-opcion no-underline">
+                    <i class="fas fa-headset icono"></i>
+                    <span class="texto">Soporte</span>
+                    <i class="fas fa-chevron-right flecha"></i>
+                </a>
+                
+                <!-- Cerrar sesión con > (rojo) -->
+                <button class="perfil-opcion danger">
+                    <i class="fas fa-sign-out-alt icono"></i>
+                    <span class="texto">Cerrar sesión</span>
+                    <i class="fas fa-chevron-right flecha"></i>
+                </button>
             </div>
         </div>
     </div>
+</div>
 
     <!-- ==================== FOOTER ==================== -->
     <footer class="bg-gradient-to-r from-blue-600 via-blue-500 to-purple-600 text-white mt-12">
