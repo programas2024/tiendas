@@ -130,27 +130,26 @@
                         <i class="fas fa-search absolute right-3 top-3 text-gray-500"></i>
                     </div>
                     
-                    <!-- Iconos de navegación -->
-                    <div class="flex items-center space-x-2 sm:space-x-4 flex-shrink-0">
-                        <a href="index.html" class="hover:text-purple-200 transition relative group p-1">
-                            <i class="fas fa-home text-lg sm:text-xl"></i>
-                            <span class="tooltip-text">Inicio</span>
-                        </a>
-                        <button id="btn-categorias" class="hover:text-purple-200 transition relative group p-1">
-                            <i class="fas fa-th-large text-lg sm:text-xl"></i>
-                            <span class="tooltip-text">Categorías</span>
-                        </button>
-                        <button id="btn-carrito" class="hover:text-purple-200 transition relative group p-1">
-                            <i class="fas fa-shopping-cart text-lg sm:text-xl"></i>
-                            <span class="tooltip-text">Carrito</span>
-                            <span id="contador-carrito" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5">0</span>
-                        </button>
-                        <button id="btn-perfil" class="hover:text-purple-200 transition relative group p-1">
-                            <i class="fas fa-user-circle text-lg sm:text-xl"></i>
-                            <span class="tooltip-text">Mi Perfil</span>
-                        </button>
-                    </div>
-                </div>
+                 <!-- Iconos de navegación -->
+<div class="flex items-center space-x-2 sm:space-x-4 flex-shrink-0">
+    <button id="btn-info" class="hover:text-purple-200 transition relative group p-1">
+        <i class="fas fa-info-circle text-lg sm:text-xl"></i>  <!-- Cambiado de info-circle a headset -->
+        <span class="tooltip-text">Soporte</span>  <!-- Cambiado el texto -->
+    </button>
+    <button id="btn-categorias" class="hover:text-purple-200 transition relative group p-1">
+        <i class="fas fa-th-large text-lg sm:text-xl"></i>
+        <span class="tooltip-text">Categorías</span>
+    </button>
+    <button id="btn-carrito" class="hover:text-purple-200 transition relative group p-1">
+        <i class="fas fa-shopping-cart text-lg sm:text-xl"></i>
+        <span class="tooltip-text">Carrito</span>
+        <span id="contador-carrito" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5">0</span>
+    </button>
+    <button id="btn-perfil" class="hover:text-purple-200 transition relative group p-1">
+        <i class="fas fa-user-circle text-lg sm:text-xl"></i>
+        <span class="tooltip-text">Mi Perfil</span>
+    </button>
+</div>
                 
                 <!-- Fila inferior: Buscador móvil (ocupa todo el ancho) -->
                 <div class="md:hidden mt-2 w-full relative">
@@ -205,6 +204,22 @@
         </div>
     </div>
 
+    <!-- ==================== INFORMACIÓN / SOPORTE (Modal) ==================== -->
+<div id="modal-info" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center modal-overlay">
+    <div class="bg-white rounded-2xl p-6 max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto modal-content">
+        <div class="flex justify-between items-center mb-4 sticky top-0 bg-white z-10 pb-2">
+            <h2 class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                <i class="fas fa-headset mr-2"></i>Centro de Soporte  <!-- Cambiado -->
+            </h2>
+            <button onclick="cerrarInfo()" class="text-gray-500 hover:text-gray-700 text-2xl">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div id="info-contenido">
+            <!-- Generado por JS -->
+        </div>
+    </div>
+</div>
     <!-- ==================== PERFIL (Modal) ==================== -->
     <div id="modal-perfil" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center modal-overlay">
         <div class="bg-white rounded-2xl p-6 max-w-md w-full mx-4 modal-content">
@@ -468,6 +483,7 @@
     <script src="tienda/js/carrito.js"></script>
     <script src="tienda/js/cupones.js"></script>
     <script src="tienda/js/soporte.js"></script>
+    <script src="tienda/js/sopotinfo.js"></script>
     <script src="tienda/js/app.js"></script>
     
 
