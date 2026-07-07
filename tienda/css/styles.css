@@ -147,6 +147,24 @@ html::-webkit-scrollbar {
     from { opacity: 0; transform: translateY(-20px); }
     to { opacity: 1; transform: translateY(0); }
 }
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
 
 /* ===== PRODUCTOS ===== */
 .producto-card {
@@ -166,7 +184,144 @@ html::-webkit-scrollbar {
     transform: scale(1.05);
 }
 
-/* ===== BOTONES DE FILTRO ===== */
+/* ===== CATEGORÍAS HORIZONTALES ===== */
+
+/* Contenedor de categorías - scroll horizontal */
+#filtros-rapidos {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 8px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 4px 2px 12px 2px;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none !important; /* Firefox */
+    -ms-overflow-style: none !important; /* IE y Edge */
+}
+
+/* Ocultar scrollbar en Chrome, Safari y Opera */
+#filtros-rapidos::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    background: transparent !important;
+}
+
+/* Estilo de cada botón de categoría */
+.btn-categoria {
+    flex: 0 0 auto;
+    padding: 8px 18px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    background: #f3f4f6;
+    color: #4b5563;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+    animation: fadeInUp 0.3s ease forwards;
+    opacity: 0;
+}
+
+.btn-categoria:nth-child(1) { animation-delay: 0.05s; }
+.btn-categoria:nth-child(2) { animation-delay: 0.1s; }
+.btn-categoria:nth-child(3) { animation-delay: 0.15s; }
+.btn-categoria:nth-child(4) { animation-delay: 0.2s; }
+.btn-categoria:nth-child(5) { animation-delay: 0.25s; }
+.btn-categoria:nth-child(6) { animation-delay: 0.3s; }
+.btn-categoria:nth-child(7) { animation-delay: 0.35s; }
+.btn-categoria:nth-child(8) { animation-delay: 0.4s; }
+.btn-categoria:nth-child(9) { animation-delay: 0.45s; }
+.btn-categoria:nth-child(10) { animation-delay: 0.5s; }
+
+.btn-categoria:hover {
+    background: #e5e7eb;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.btn-categoria.active {
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    color: white;
+    border-color: #8b5cf6;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+.btn-categoria .badge-count {
+    display: inline-block;
+    background: rgba(255,255,255,0.3);
+    padding: 0 8px;
+    border-radius: 10px;
+    font-size: 10px;
+    margin-left: 4px;
+}
+
+.btn-categoria.active .badge-count {
+    background: rgba(255,255,255,0.25);
+}
+
+/* Iconos en las categorías */
+.btn-categoria i {
+    margin-right: 6px;
+    font-size: 12px;
+}
+
+/* Indicador visual de que se puede hacer scroll */
+#filtros-rapidos::after {
+    content: '';
+    position: sticky;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: 30px;
+    background: linear-gradient(to right, transparent, rgba(255,255,255,0.8));
+    pointer-events: none;
+    flex-shrink: 0;
+}
+
+/* Sombra en los bordes para indicar scroll */
+.categories-wrapper {
+    position: relative;
+}
+
+.categories-wrapper::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 20px;
+    background: linear-gradient(to right, rgba(255,255,255,0.9), transparent);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.categories-wrapper::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: 20px;
+    background: linear-gradient(to left, rgba(255,255,255,0.9), transparent);
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Indicador de scroll en móvil */
+.scroll-indicator {
+    display: none;
+    text-align: center;
+    font-size: 11px;
+    color: #9ca3af;
+    margin-top: 4px;
+    animation: pulse 2s infinite;
+}
+
+/* ===== BOTONES DE FILTRO (legado) ===== */
 .filtro-btn {
     transition: all 0.3s ease;
     border: 2px solid transparent;
@@ -320,17 +475,187 @@ html::-webkit-scrollbar {
     color: #d1d5db;
 }
 
-/* ===== RESPONSIVE ===== */
-@media (max-width: 640px) {
-    .producto-card {
-        animation: fadeIn 0.4s ease forwards;
+/* ==================== HEADER RESPONSIVE ==================== */
+
+/* Breakpoint personalizado para pantallas muy pequeñas */
+@media (min-width: 480px) {
+    .xs\:inline {
+        display: inline !important;
     }
-    .modal-content {
-        margin: 12px;
-        border-radius: 16px;
-    }
-    .tooltip-text {
-        display: none;
+    .xs\:hidden {
+        display: none !important;
     }
 }
+
+/* Asegurar que el buscador móvil ocupe todo el ancho */
+#buscador-movil {
+    width: 100% !important;
+    min-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* Mejorar espaciado en móvil */
+@media (max-width: 640px) {
+    header nav {
+        padding-left: 8px !important;
+        padding-right: 8px !important;
+    }
+    
+    /* Ajustar el padding del buscador móvil */
+    #buscador-movil {
+        padding: 10px 40px 10px 16px !important;
+        font-size: 14px !important;
+    }
+    
+    /* Ajustar posición del ícono de búsqueda */
+    .md\:hidden .fa-search {
+        top: 12px !important;
+        right: 12px !important;
+    }
+    
+    /* Hacer los botones más pequeños en móvil */
+    .flex.items-center.space-x-2 button {
+        padding: 4px !important;
+    }
+}
+
+/* Mejorar el contador del carrito en móvil */
+@media (max-width: 640px) {
+    #contador-carrito {
+        font-size: 10px !important;
+        padding: 1px 5px !important;
+        top: -6px !important;
+        right: -6px !important;
+    }
+}
+
+/* Animación suave para el navbar */
+header {
+    transition: all 0.3s ease;
+}
+
+/* Mejorar el tooltip en móvil */
+@media (max-width: 640px) {
+    .tooltip-text {
+        display: none !important;
+    }
+}
+
+/* ================================================================ */
+/* ============== RESPONSIVE PARA CATEGORÍAS ===================== */
+/* ================================================================ */
+
+/* Mostrar indicador solo en móvil */
+@media (max-width: 768px) {
+    .scroll-indicator {
+        display: block;
+    }
+}
+
+/* Ajustes para móvil */
+@media (max-width: 640px) {
+    .btn-categoria {
+        font-size: 12px;
+        padding: 6px 14px;
+    }
+    
+    .btn-categoria i {
+        font-size: 11px;
+        margin-right: 4px;
+    }
+    
+    #filtros-rapidos {
+        gap: 6px;
+        padding: 4px 2px 10px 2px;
+    }
+}
+
+/* Desktop: mostrar más espacio */
+@media (min-width: 1024px) {
+    #filtros-rapidos {
+        gap: 10px;
+        padding: 4px 4px 14px 4px;
+        flex-wrap: wrap; /* En desktop permite wrapping */
+    }
+    
+    .btn-categoria {
+        font-size: 14px;
+        padding: 10px 24px;
+    }
+}
+
+/* Tablets: mantener horizontal */
+@media (min-width: 641px) and (max-width: 1023px) {
+    #filtros-rapidos {
+        gap: 8px;
+        padding: 4px 4px 12px 4px;
+    }
+    
+    .btn-categoria {
+        font-size: 13px;
+        padding: 8px 18px;
+    }
+}
+
+/* ===== SHIMMER EFFECT PARA CARGA ===== */
+.shimmer {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+/* ===== SCROLL SUAVE ===== */
+.smooth-scroll {
+    scroll-behavior: smooth;
+}
+
+/* ===== BOTÓN SCROLL PARA CATEGORÍAS ===== */
+.btn-scroll {
+    flex: 0 0 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: white;
+    border: 1px solid #e5e7eb;
+    color: #4b5563;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.btn-scroll:hover {
+    background: #f3f4f6;
+    border-color: #8b5cf6;
+    color: #8b5cf6;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.btn-scroll:active {
+    transform: scale(0.95);
+}
+
+/* ===== SCROLLBAR PERSONALIZADA (solo para algunos elementos) ===== */
+.custom-scroll {
+    scrollbar-width: thin !important;
+    scrollbar-color: #8b5cf6 #e5e7eb !important;
+}
+.custom-scroll::-webkit-scrollbar {
+    width: 6px !important;
+    height: 6px !important;
+}
+.custom-scroll::-webkit-scrollbar-track {
+    background: #e5e7eb !important;
+    border-radius: 10px !important;
+}
+.custom-scroll::-webkit-scrollbar-thumb {
+    background: #8b5cf6 !important;
+    border-radius: 10px !important;
+}
+.custom-scroll::-webkit-scrollbar-thumb:hover {
+    background: #7c3aed !important;
+}
+
 

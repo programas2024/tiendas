@@ -41,7 +41,8 @@ function inicializarTooltips() {
     const tooltips = [
         { id: '#btn-categorias', content: '📂 Explorar categorías' },
         { id: '#btn-carrito', content: '🛒 Ver mi carrito' },
-        { id: '#btn-perfil', content: '👤 Mi perfil' }
+        { id: '#btn-perfil', content: '👤 Mi perfil' },
+        { id: '#btn-info', content: 'ℹ️ Información de la tienda' },
     ];
     
     tooltips.forEach(({ id, content }) => {
