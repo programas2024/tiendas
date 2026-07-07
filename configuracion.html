@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShopVerse - Configuración</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- Tippy.js para Tooltips -->
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://unpkg.com/tippy.js@6"></script>
+    <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/animations/shift-away.css" />
+    
+    <!-- Estilos personalizados -->
+    <link rel="stylesheet" href="tienda/css/styles.css">
+    
+    <style>
+        /* Estilos adicionales para configuración */
+        .config-card {
+            transition: all 0.3s ease;
+            border: 1px solid #e5e7eb;
+            cursor: pointer;
+        }
+        .config-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+            border-color: #8b5cf6;
+        }
+        .config-card .icon-wrapper {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .config-card .icon-wrapper.blue { background: #dbeafe; color: #3b82f6; }
+        .config-card .icon-wrapper.purple { background: #ede9fe; color: #7c3aed; }
+        .config-card .icon-wrapper.green { background: #d1fae5; color: #10b981; }
+        .config-card .icon-wrapper.orange { background: #fef3c7; color: #f59e0b; }
+        .config-card .icon-wrapper.red { background: #fee2e2; color: #ef4444; }
+        .config-card .icon-wrapper.pink { background: #fce7f3; color: #ec4899; }
+        .config-card .icon-wrapper.indigo { background: #e0e7ff; color: #6366f1; }
+        .config-card .icon-wrapper.cyan { background: #cffafe; color: #06b6d4; }
+        .config-card .icon-wrapper.teal { background: #ccfbf1; color: #14b8a6; }
+        .config-card .icon-wrapper.rose { background: #ffe4e6; color: #f43f5e; }
+        
+        .config-card .arrow {
+            color: #9ca3af;
+            transition: all 0.3s ease;
+        }
+        .config-card:hover .arrow {
+            color: #7c3aed;
+            transform: translateX(4px);
+        }
+        
+        .config-section-title {
+            position: relative;
+            padding-bottom: 8px;
+        }
+        .config-section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background: linear-gradient(to right, #3b82f6, #8b5cf6);
+            border-radius: 4px;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 48px;
+            height: 26px;
+            background: #d1d5db;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .toggle-switch.active {
+            background: #7c3aed;
+        }
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .toggle-switch.active::after {
+            transform: translateX(22px);
+        }
+        
+        .badge-vip {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .breadcrumb {
+            color: #9ca3af;
+            font-size: 0.9rem;
+        }
+        .breadcrumb a {
+            color: #6b7280;
+            transition: color 0.3s ease;
+        }
+        .breadcrumb a:hover {
+            color: #8b5cf6;
+        }
+        .breadcrumb .separator {
+            margin: 0 8px;
+        }
+    </style>
+</head>
+<body>
+    
+    <!-- ==================== HEADER / NAVBAR ==================== -->
+    <header class="sticky top-0 z-50 shadow-lg">
+        <nav class="bg-gradient-to-r from-blue-600 via-blue-500 to-purple-600 text-white px-2 sm:px-4 py-2">
+            <div class="container mx-auto">
+                <!-- Fila superior: Logo + Iconos -->
+                <div class="flex items-center justify-between">
+                    <!-- Logo -->
+                    <a href="index.html" class="flex items-center space-x-2 text-xl sm:text-2xl font-bold flex-shrink-0">
+                        <i class="fas fa-store-alt"></i>
+                        <span class="hidden xs:inline">ShopVerse</span>
+                        <span class="xs:hidden">SV</span>
+                    </a>
+                    
+                    <!-- Buscador centrado (oculto en móvil) -->
+                    <div class="hidden md:block flex-1 max-w-md mx-4 relative">
+                        <input type="text" id="buscador" placeholder="Buscar productos..." 
+                               class="w-full px-4 py-2 rounded-full text-gray-800 focus:outline-none focus:ring-2 focus:ring-purple-300">
+                        <i class="fas fa-search absolute right-3 top-3 text-gray-500"></i>
+                    </div>
+                    
+                    <!-- Iconos de navegación -->
+                    <div class="flex items-center space-x-2 sm:space-x-4 flex-shrink-0">
+                        <a href="index.html" class="hover:text-purple-200 transition relative group p-1">
+                            <i class="fas fa-home text-lg sm:text-xl"></i>
+                            <span class="tooltip-text">Inicio</span>
+                        </a>
+                        <button id="btn-categorias" class="hover:text-purple-200 transition relative group p-1">
+                            <i class="fas fa-th-large text-lg sm:text-xl"></i>
+                            <span class="tooltip-text">Categorías</span>
+                        </button>
+                        <button id="btn-carrito" class="hover:text-purple-200 transition relative group p-1">
+                            <i class="fas fa-shopping-cart text-lg sm:text-xl"></i>
+                            <span class="tooltip-text">Carrito</span>
+                            <span id="contador-carrito" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5">0</span>
+                        </button>
+                        <button id="btn-perfil" class="hover:text-purple-200 transition relative group p-1">
+                            <i class="fas fa-user-circle text-lg sm:text-xl"></i>
+                            <span class="tooltip-text">Mi Perfil</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Fila inferior: Buscador móvil -->
+                <div class="md:hidden mt-2 w-full relative">
+                    <input type="text" id="buscador-movil" placeholder="Buscar productos..." 
+                           class="w-full px-4 py-2.5 rounded-full text-gray-800 focus:outline-none focus:ring-2 focus:ring-purple-300 text-sm sm:text-base">
+                    <i class="fas fa-search absolute right-3 top-3.5 text-gray-500"></i>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- ==================== CATEGORÍAS (Modal) ==================== -->
+    <div id="modal-categorias" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center modal-overlay">
+        <div class="bg-white rounded-2xl p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                    <i class="fas fa-th-large mr-2"></i>Categorías
+                </h2>
+                <button onclick="cerrarModal('modal-categorias')" class="text-gray-500 hover:text-gray-700 text-2xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="lista-categorias">
+                <!-- Generado por JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== CARRITO (Modal) ==================== -->
+    <div id="modal-carrito" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center modal-overlay">
+        <div class="bg-white rounded-2xl p-6 max-w-2xl w-full mx-4 max-h-[90vh] flex flex-col modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                    <i class="fas fa-shopping-cart mr-2"></i>Mi Carrito
+                </h2>
+                <button onclick="cerrarModal('modal-carrito')" class="text-gray-500 hover:text-gray-700 text-2xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="carrito-contenido" class="flex-1 overflow-y-auto">
+                <!-- Generado por JS -->
+            </div>
+            <div class="border-t pt-4 mt-4">
+                <div class="flex justify-between text-xl font-bold mb-4">
+                    <span>Total:</span>
+                    <span id="carrito-total" class="text-purple-600"></span>
+                </div>
+                <button onclick="finalizarCompra()" class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl hover:shadow-lg transition transform hover:scale-105">
+                    <i class="fas fa-check mr-2"></i>Finalizar Compra
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== PERFIL (Modal) ==================== -->
+    <div id="modal-perfil" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center modal-overlay">
+        <div class="bg-white rounded-2xl p-6 max-w-md w-full mx-4 modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                    <i class="fas fa-user-circle mr-2"></i>Mi Perfil
+                </h2>
+                <button onclick="cerrarModal('modal-perfil')" class="text-gray-500 hover:text-gray-700 text-2xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="text-center">
+                <div class="w-24 h-24 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full mx-auto flex items-center justify-center text-4xl text-white mb-4 shadow-lg">
+                    <i class="fas fa-user"></i>
+                </div>
+                <h3 class="text-xl font-bold">Usuario Demo</h3>
+                <p class="text-gray-500">usuario@shopverse.com</p>
+                <div class="mt-6 space-y-2">
+                    <button class="perfil-opcion"><i class="fas fa-history icono"></i><span class="texto">Mis compras</span><i class="fas fa-chevron-right flecha"></i></button>
+                    <button class="perfil-opcion"><i class="fas fa-heart icono"></i><span class="texto">Favoritos</span><i class="fas fa-chevron-right flecha"></i></button>
+                    <a href="configuracion.html" class="perfil-opcion no-underline"><i class="fas fa-cog icono"></i><span class="texto">Configuración</span><i class="fas fa-chevron-right flecha"></i></a>
+                    <a href="soporte.html" class="perfil-opcion no-underline"><i class="fas fa-headset icono"></i><span class="texto">Soporte</span><i class="fas fa-chevron-right flecha"></i></a>
+                    <button class="perfil-opcion danger"><i class="fas fa-sign-out-alt icono"></i><span class="texto">Cerrar sesión</span><i class="fas fa-chevron-right flecha"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== CONTENIDO PRINCIPAL - CONFIGURACIÓN ==================== -->
+    <main class="container mx-auto px-4 py-8">
+        
+        <!-- Breadcrumb / Migas de pan -->
+        <div class="breadcrumb mb-6">
+            <a href="index.html"><i class="fas fa-home"></i> Inicio</a>
+            <span class="separator">/</span>
+            <a href="#">Perfil</a>
+            <span class="separator">/</span>
+            <span class="text-gray-700 font-medium">Configuración</span>
+        </div>
+
+        <!-- Título principal -->
+        <div class="flex items-center gap-4 mb-8">
+            <div class="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+                <i class="fas fa-cog text-white text-3xl"></i>
+            </div>
+            <div>
+                <h1 class="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                    Configuración
+                </h1>
+                <p class="text-gray-500">Personaliza tu experiencia en ShopVerse</p>
+            </div>
+        </div>
+
+        <!-- Secciones de configuración -->
+        <div class="space-y-8">
+            
+            <!-- ===== SECCIÓN 1: PERFIL ===== -->
+            <div>
+                <h2 class="config-section-title text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <i class="fas fa-user-circle text-purple-600"></i>
+                    Perfil
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Nombre -->
+                    <div class="config-card bg-white rounded-xl p-4 flex items-center justify-between" onclick="editarConfig('nombre')">
+                        <div class="flex items-center gap-3">
+                            <div class="icon-wrapper blue"><i class="fas fa-user"></i></div>
+                            <div>
+                                <p class="font-semibold text-gray-800 text-sm">Nombre</p>
+                                <p class="text-sm text-gray-500">Usuario Demo</p>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-right arrow"></i>
+                    </div>
+                    <!-- Correo -->
+                    <div class="config-card bg-white rounded-xl p-4 flex items-center justify-between" onclick="editarConfig('correo')">
+                        <div class="flex items-center gap-3">
+                            <div class="icon-wrapper purple"><i class="fas fa-envelope"></i></div>
+                            <div>
+                                <p class="font-semibold text-gray-800 text-sm">Correo electrónico</p>
+                                <p class="text-sm text-gray-500">usuario@shopverse.com</p>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-right arrow"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== SECCIÓN 2: CUENTA ===== -->
+            <div>
+                <h2 class="config-section-title text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <i class="fas fa-wallet text-green-600"></i>
+                    Cuenta
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Logros -->
+                    <div class="config-card bg-white rounded-xl p-4 flex items-center justify-between" onclick="editarConfig('logros')">
+                        <div class="flex items-center gap-3">
+                            <div class="icon-wrapper orange"><i class="fas fa-trophy"></i></div>
+                            <div>
+                                <p class="font-semibold text-gray-800 text-sm">Logros</p>
+                                <p class="text-sm text-gray-500">12 logros desbloqueados</p>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-right arrow"></i>
+                    </div>
+                    <!-- Saldo -->
+                    <div class="config-card bg-white rounded-xl p-4 flex items-center justify-between" onclick="editarConfig('saldo')">
+                        <div class="flex items-center gap-3">
+                            <div class="icon-wrapper green"><i class="fas fa-coins"></i></div>
+                            <div>
+                                <p class="font-semibold text-gray-800 text-sm">Saldo disponible</p>
+                                <p class="text-sm text-green-600 font-bold">$25.000 CLP</p>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-right arrow"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== SECCIÓN 3: SOCIAL ===== -->
+            <div>
+                <h2 class="config-section-title text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <i class="fas fa-share-alt text-blue-600"></i>
+                    Redes Sociales
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="config-card bg-white rounded-xl p-4 flex items-center justify-between" onclick="editarConfig('redes')">
+                        <div class="flex items-center gap-3">
+                            <div class="icon-wrapper blue"><i class="fab fa-facebook"></i></div>
+                            <div>
+                                <p class="font-semibold text-gray-800 text-sm">Facebook</p>
+                                <p class="text-sm text-gray-500">Conectar cuenta</p>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-right arrow"></i>
+                    </div>
+                    <div class="config-card bg-white rounded-xl p-4 flex items-center justify-between" onclick="editarConfig('redes')">
+                        <div class="flex items-center gap-3">
+                            <div class="icon-wrapper pink"><i class="fab fa-instagram"></i></div>
+                            <div>
+                                <p class="font-semibold text-gray-800 text-sm">Instagram</p>
+                                <p class="text-sm text-gray-500">Conectar cuenta</p>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-right arrow"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== SECCIÓN 4: PRIVACIDAD ===== -->
+            <div>
+                <h2 class="config-section-title text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <i class="fas fa-lock text-red-600"></i>
+                    Privacidad
+                </h2>
+                <div class="grid grid-cols-1 gap-4">
+                    <div class="config-card bg-white rounded-xl p-4 flex items-center justify-between" onclick="editarConfig('privacidad')">
+                        <div class="flex items-center gap-3">
+                            <div class="icon-wrapper red"><i class="fas fa-user-secret"></i></div>
+                            <div>
+                                <p class="font-semibold text-gray-800 text-sm">Privacidad</p>
+                                <p class="text-sm text-gray-500">Control de datos personales</p>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-right arrow"></i>
+                    </div>
+                    <div class="config-card bg-white rounded-xl p-4 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="icon-wrapper purple"><i class="fas fa-eye"></i></div>
+                            <div>
+                                <p class="font-semibold text-gray-800 text-sm">Perfil público</p>
+                                <p class="text-sm text-gray-500">Mostrar información en el perfil</p>
+                            </div>
+                        </div>
+                        <div class="toggle-switch active" onclick="toggleSwitch(this)"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== SECCIÓN 5: ACCESIBILIDAD ===== -->
+            <div>
+                <h2 class="config-section-title text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <i class="fas fa-universal-access text-indigo-600"></i>
+                    Accesibilidad
+                </h2>
+                <div class="grid grid-cols-1 gap-4">
+                    <div class="config-card bg-white rounded-xl p-4 flex items-center justify-between" onclick="editarConfig('accesibilidad')">
+                        <div class="flex items-center gap-3">
+                            <div class="icon-wrapper indigo"><i class="fas fa-font"></i></div>
+                            <div>
+                                <p class="font-semibold text-gray-800 text-sm">Tamaño de fuente</p>
+                                <p class="text-sm text-gray-500">Mediano</p>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-right arrow"></i>
+                    </div>
+                    <div class="config-card bg-white rounded-xl p-4 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="icon-wrapper cyan"><i class="fas fa-moon"></i></div>
+                            <div>
+                                <p class="font-semibold text-gray-800 text-sm">Modo oscuro</p>
+                                <p class="text-sm text-gray-500">Cambiar tema de la aplicación</p>
+                            </div>
+                        </div>
+                        <div class="toggle-switch" onclick="toggleSwitch(this)"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== SECCIÓN 6: BENEFICIOS ===== -->
+            <div>
+                <h2 class="config-section-title text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <i class="fas fa-gem text-yellow-600"></i>
+                    Beneficios
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Invitar -->
+                    <div class="config-card bg-white rounded-xl p-4 flex items-center justify-between" onclick="editarConfig('invitar')">
+                        <div class="flex items-center gap-3">
+                            <div class="icon-wrapper orange"><i class="fas fa-user-plus"></i></div>
+                            <div>
+                                <p class="font-semibold text-gray-800 text-sm">Invitar amigos</p>
+                                <p class="text-sm text-gray-500">Gana $5.000 por cada invitado</p>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-right arrow"></i>
+                    </div>
+                    <!-- Descuentos VIP -->
+                    <div class="config-card bg-white rounded-xl p-4 flex items-center justify-between" onclick="editarConfig('vip')">
+                        <div class="flex items-center gap-3">
+                            <div class="icon-wrapper teal"><i class="fas fa-crown"></i></div>
+                            <div>
+                                <p class="font-semibold text-gray-800 text-sm">Descuentos VIP</p>
+                                <p class="text-sm text-gray-500"><span class="badge-vip">VIP</span> 15% de descuento</p>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-right arrow"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== SECCIÓN 7: LEGAL ===== -->
+            <div>
+                <h2 class="config-section-title text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <i class="fas fa-gavel text-gray-600"></i>
+                    Legal
+                </h2>
+                <div class="grid grid-cols-1 gap-4">
+                    <div class="config-card bg-white rounded-xl p-4 flex items-center justify-between" onclick="editarConfig('terminos')">
+                        <div class="flex items-center gap-3">
+                            <div class="icon-wrapper rose"><i class="fas fa-file-contract"></i></div>
+                            <div>
+                                <p class="font-semibold text-gray-800 text-sm">Términos y condiciones</p>
+                                <p class="text-sm text-gray-500">Políticas de uso y servicios</p>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-right arrow"></i>
+                    </div>
+                    <div class="config-card bg-white rounded-xl p-4 flex items-center justify-between" onclick="editarConfig('terminos')">
+                        <div class="flex items-center gap-3">
+                            <div class="icon-wrapper purple"><i class="fas fa-shield-alt"></i></div>
+                            <div>
+                                <p class="font-semibold text-gray-800 text-sm">Política de privacidad</p>
+                                <p class="text-sm text-gray-500">Protección de datos personales</p>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-right arrow"></i>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Botón de guardar cambios -->
+        <div class="mt-10 text-center">
+            <button onclick="guardarConfiguracion()" class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-xl hover:shadow-xl transition transform hover:scale-105 font-bold">
+                <i class="fas fa-save mr-2"></i>Guardar cambios
+            </button>
+            <button onclick="volverInicio()" class="ml-3 bg-gray-200 text-gray-700 px-8 py-3 rounded-xl hover:bg-gray-300 transition">
+                <i class="fas fa-arrow-left mr-2"></i>Volver
+            </button>
+        </div>
+
+    </main>
+
+    <!-- ==================== FOOTER ==================== -->
+    <footer class="bg-gradient-to-r from-blue-600 via-blue-500 to-purple-600 text-white mt-12">
+        <div class="container mx-auto px-4 py-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
+                <div>
+                    <h3 class="font-bold text-xl mb-2 flex items-center justify-center md:justify-start gap-2">
+                        <i class="fas fa-store-alt"></i> ShopVerse
+                    </h3>
+                    <p class="text-blue-100">Tu tienda virtual favorita</p>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-2">Enlaces</h4>
+                    <ul class="space-y-1 text-blue-100">
+                        <li><a href="#" class="hover:text-white transition">Términos y condiciones</a></li>
+                        <li><a href="#" class="hover:text-white transition">Política de privacidad</a></li>
+                        <li><a href="soporte.html" class="hover:text-white transition">Centro de ayuda</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-2">Síguenos</h4>
+                    <div class="flex justify-center md:justify-start space-x-4">
+                        <a href="#" class="text-2xl hover:text-purple-200 transition transform hover:scale-110"><i class="fab fa-facebook"></i></a>
+                        <a href="#" class="text-2xl hover:text-purple-200 transition transform hover:scale-110"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-2xl hover:text-purple-200 transition transform hover:scale-110"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-2xl hover:text-purple-200 transition transform hover:scale-110"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-blue-400 mt-6 pt-6 text-center text-blue-100">
+                <p>&copy; 2026 ShopVerse. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ==================== SCRIPTS ==================== -->
+    <script src="tienda/js/productos.js"></script>
+    <script src="tienda/js/carrito.js"></script>
+    <script src="tienda/js/perfil.js"></script>
+    <script src="tienda/js/configuracion.js"></script>
+    <script src="tienda/js/app.js"></script>
+    
+   
+</body>
+</html>

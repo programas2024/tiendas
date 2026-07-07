@@ -120,6 +120,7 @@
                         <i class="fas fa-search absolute right-3 top-3 text-gray-500"></i>
                     </div>
                     
+<<<<<<< HEAD
                     <div class="flex items-center space-x-2 sm:space-x-4 flex-shrink-0">
                         <a id="btn-volver-inicio" href="index.html" class="hover:text-purple-200 transition relative group p-1">
                             <i class="fas fa-home text-lg sm:text-xl"></i>
@@ -136,6 +137,28 @@
                         </button>
                     </div>
                 </div>
+=======
+                 <!-- Iconos de navegación -->
+<div class="flex items-center space-x-2 sm:space-x-4 flex-shrink-0">
+    <button id="btn-info" class="hover:text-purple-200 transition relative group p-1">
+        <i class="fas fa-info-circle text-lg sm:text-xl"></i>  <!-- Cambiado de info-circle a headset -->
+        <span class="tooltip-text">Soporte</span>  <!-- Cambiado el texto -->
+    </button>
+    <button id="btn-categorias" class="hover:text-purple-200 transition relative group p-1">
+        <i class="fas fa-th-large text-lg sm:text-xl"></i>
+        <span class="tooltip-text">Categorías</span>
+    </button>
+    <button id="btn-carrito" class="hover:text-purple-200 transition relative group p-1">
+        <i class="fas fa-shopping-cart text-lg sm:text-xl"></i>
+        <span class="tooltip-text">Carrito</span>
+        <span id="contador-carrito" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5">0</span>
+    </button>
+    <button id="btn-perfil" class="hover:text-purple-200 transition relative group p-1">
+        <i class="fas fa-user-circle text-lg sm:text-xl"></i>
+        <span class="tooltip-text">Mi Perfil</span>
+    </button>
+</div>
+>>>>>>> 9f885af9a2c24667c7cb64b29e1a5dc609248fc0
                 
                 <div class="md:hidden mt-2 w-full relative">
                     <input type="text" id="buscador-movil" placeholder="Buscar productos..." 
@@ -146,6 +169,97 @@
         </nav>
     </header>
 
+<<<<<<< HEAD
+=======
+    <!-- ==================== CATEGORÍAS (Modal) ==================== -->
+    <div id="modal-categorias" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center modal-overlay">
+        <div class="bg-white rounded-2xl p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                    <i class="fas fa-th-large mr-2"></i>Categorías
+                </h2>
+                <button onclick="cerrarModal('modal-categorias')" class="text-gray-500 hover:text-gray-700 text-2xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="lista-categorias">
+                <!-- Generado por JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== CARRITO (Modal) ==================== -->
+    <div id="modal-carrito" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center modal-overlay">
+        <div class="bg-white rounded-2xl p-6 max-w-2xl w-full mx-4 max-h-[90vh] flex flex-col modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                    <i class="fas fa-shopping-cart mr-2"></i>Mi Carrito
+                </h2>
+                <button onclick="cerrarModal('modal-carrito')" class="text-gray-500 hover:text-gray-700 text-2xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="carrito-contenido" class="flex-1 overflow-y-auto">
+                <!-- Generado por JS -->
+            </div>
+            <div class="border-t pt-4 mt-4">
+                <div class="flex justify-between text-xl font-bold mb-4">
+                    <span>Total:</span>
+                    <span id="carrito-total" class="text-purple-600"></span>
+                </div>
+                <button onclick="finalizarCompra()" class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl hover:shadow-lg transition transform hover:scale-105">
+                    <i class="fas fa-check mr-2"></i>Finalizar Compra
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== INFORMACIÓN / SOPORTE (Modal) ==================== -->
+<div id="modal-info" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center modal-overlay">
+    <div class="bg-white rounded-2xl p-6 max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto modal-content">
+        <div class="flex justify-between items-center mb-4 sticky top-0 bg-white z-10 pb-2">
+            <h2 class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                <i class="fas fa-headset mr-2"></i>Centro de Soporte  <!-- Cambiado -->
+            </h2>
+            <button onclick="cerrarInfo()" class="text-gray-500 hover:text-gray-700 text-2xl">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div id="info-contenido">
+            <!-- Generado por JS -->
+        </div>
+    </div>
+</div>
+    <!-- ==================== PERFIL (Modal) ==================== -->
+    <div id="modal-perfil" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center modal-overlay">
+        <div class="bg-white rounded-2xl p-6 max-w-md w-full mx-4 modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                    <i class="fas fa-user-circle mr-2"></i>Mi Perfil
+                </h2>
+                <button onclick="cerrarModal('modal-perfil')" class="text-gray-500 hover:text-gray-700 text-2xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="text-center">
+                <div class="w-24 h-24 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full mx-auto flex items-center justify-center text-4xl text-white mb-4 shadow-lg">
+                    <i class="fas fa-user"></i>
+                </div>
+                <h3 class="text-xl font-bold">Usuario Demo</h3>
+                <p class="text-gray-500">usuario@shopverse.com</p>
+                <div class="mt-6 space-y-2">
+                    <button class="perfil-opcion"><i class="fas fa-history icono"></i><span class="texto">Mis compras</span><i class="fas fa-chevron-right flecha"></i></button>
+                    <button class="perfil-opcion"><i class="fas fa-heart icono"></i><span class="texto">Favoritos</span><i class="fas fa-chevron-right flecha"></i></button>
+                    <button class="perfil-opcion"><i class="fas fa-cog icono"></i><span class="texto">Configuración</span><i class="fas fa-chevron-right flecha"></i></button>
+                    <a href="soporte.html" class="perfil-opcion no-underline"><i class="fas fa-headset icono"></i><span class="texto">Soporte</span><i class="fas fa-chevron-right flecha"></i></a>
+                    <button class="perfil-opcion danger"><i class="fas fa-sign-out-alt icono"></i><span class="texto">Cerrar sesión</span><i class="fas fa-chevron-right flecha"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== CONTENIDO PRINCIPAL - SOPORTE ==================== -->
+>>>>>>> 9f885af9a2c24667c7cb64b29e1a5dc609248fc0
     <main class="container mx-auto px-4 py-8">
         
         <div class="breadcrumb mb-6">
@@ -306,5 +420,12 @@
     </main>
 
     <script src="tienda/js/soporte.js"></script>
+<<<<<<< HEAD
+=======
+    <script src="tienda/js/sopotinfo.js"></script>
+    <script src="tienda/js/app.js"></script>
+    
+
+>>>>>>> 9f885af9a2c24667c7cb64b29e1a5dc609248fc0
 </body>
 </html>
