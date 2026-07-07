@@ -120,46 +120,29 @@
                         <i class="fas fa-search absolute right-3 top-3 text-gray-500"></i>
                     </div>
                     
-<<<<<<< HEAD
+                    <!-- Iconos de navegación (lado derecho) -->
                     <div class="flex items-center space-x-2 sm:space-x-4 flex-shrink-0">
-                        <a id="btn-volver-inicio" href="index.html" class="hover:text-purple-200 transition relative group p-1">
-                            <i class="fas fa-home text-lg sm:text-xl"></i>
-                        </a>
+                        <button id="btn-info" class="hover:text-purple-200 transition relative group p-1">
+                            <i class="fas fa-info-circle text-lg sm:text-xl"></i>
+                            <span class="tooltip-text">Soporte</span>
+                        </button>
                         <button id="btn-categorias" class="hover:text-purple-200 transition relative group p-1">
                             <i class="fas fa-th-large text-lg sm:text-xl"></i>
+                            <span class="tooltip-text">Categorías</span>
                         </button>
                         <button id="btn-carrito" class="hover:text-purple-200 transition relative group p-1">
                             <i class="fas fa-shopping-cart text-lg sm:text-xl"></i>
+                            <span class="tooltip-text">Carrito</span>
                             <span id="contador-carrito" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5">0</span>
                         </button>
                         <button id="btn-perfil" class="hover:text-purple-200 transition relative group p-1">
                             <i class="fas fa-user-circle text-lg sm:text-xl"></i>
+                            <span class="tooltip-text">Mi Perfil</span>
                         </button>
                     </div>
                 </div>
-=======
-                 <!-- Iconos de navegación -->
-<div class="flex items-center space-x-2 sm:space-x-4 flex-shrink-0">
-    <button id="btn-info" class="hover:text-purple-200 transition relative group p-1">
-        <i class="fas fa-info-circle text-lg sm:text-xl"></i>  <!-- Cambiado de info-circle a headset -->
-        <span class="tooltip-text">Soporte</span>  <!-- Cambiado el texto -->
-    </button>
-    <button id="btn-categorias" class="hover:text-purple-200 transition relative group p-1">
-        <i class="fas fa-th-large text-lg sm:text-xl"></i>
-        <span class="tooltip-text">Categorías</span>
-    </button>
-    <button id="btn-carrito" class="hover:text-purple-200 transition relative group p-1">
-        <i class="fas fa-shopping-cart text-lg sm:text-xl"></i>
-        <span class="tooltip-text">Carrito</span>
-        <span id="contador-carrito" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5">0</span>
-    </button>
-    <button id="btn-perfil" class="hover:text-purple-200 transition relative group p-1">
-        <i class="fas fa-user-circle text-lg sm:text-xl"></i>
-        <span class="tooltip-text">Mi Perfil</span>
-    </button>
-</div>
->>>>>>> 9f885af9a2c24667c7cb64b29e1a5dc609248fc0
-                
+
+                <!-- Buscador móvil -->
                 <div class="md:hidden mt-2 w-full relative">
                     <input type="text" id="buscador-movil" placeholder="Buscar productos..." 
                            class="w-full px-4 py-2.5 rounded-full text-gray-800 focus:outline-none focus:ring-2 focus:ring-purple-300 text-sm sm:text-base">
@@ -169,8 +152,7 @@
         </nav>
     </header>
 
-<<<<<<< HEAD
-=======
+
     <!-- ==================== CATEGORÍAS (Modal) ==================== -->
     <div id="modal-categorias" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center modal-overlay">
         <div class="bg-white rounded-2xl p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto modal-content">
@@ -215,21 +197,22 @@
     </div>
 
     <!-- ==================== INFORMACIÓN / SOPORTE (Modal) ==================== -->
-<div id="modal-info" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center modal-overlay">
-    <div class="bg-white rounded-2xl p-6 max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto modal-content">
-        <div class="flex justify-between items-center mb-4 sticky top-0 bg-white z-10 pb-2">
-            <h2 class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                <i class="fas fa-headset mr-2"></i>Centro de Soporte  <!-- Cambiado -->
-            </h2>
-            <button onclick="cerrarInfo()" class="text-gray-500 hover:text-gray-700 text-2xl">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div id="info-contenido">
-            <!-- Generado por JS -->
+    <div id="modal-info" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center modal-overlay">
+        <div class="bg-white rounded-2xl p-6 max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto modal-content">
+            <div class="flex justify-between items-center mb-4 sticky top-0 bg-white z-10 pb-2">
+                <h2 class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                    <i class="fas fa-headset mr-2"></i>Centro de Soporte
+                </h2>
+                <button onclick="cerrarInfo()" class="text-gray-500 hover:text-gray-700 text-2xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="info-contenido">
+                <!-- Generado por JS -->
+            </div>
         </div>
     </div>
-</div>
+
     <!-- ==================== PERFIL (Modal) ==================== -->
     <div id="modal-perfil" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center modal-overlay">
         <div class="bg-white rounded-2xl p-6 max-w-md w-full mx-4 modal-content">
@@ -259,7 +242,7 @@
     </div>
 
     <!-- ==================== CONTENIDO PRINCIPAL - SOPORTE ==================== -->
->>>>>>> 9f885af9a2c24667c7cb64b29e1a5dc609248fc0
+
     <main class="container mx-auto px-4 py-8">
         
         <div class="breadcrumb mb-6">
@@ -420,12 +403,11 @@
     </main>
 
     <script src="tienda/js/soporte.js"></script>
-<<<<<<< HEAD
-=======
     <script src="tienda/js/sopotinfo.js"></script>
+    
     <script src="tienda/js/app.js"></script>
     
 
->>>>>>> 9f885af9a2c24667c7cb64b29e1a5dc609248fc0
+
 </body>
 </html>
