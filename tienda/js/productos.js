@@ -355,6 +355,32 @@ const productos = [
         reviews: 34,
         stock: 38,
         especificaciones: ["200 piezas", "3D"]
+    },
+    {
+        id: 16,
+        nombre: "Consola Portátil",
+        precio: 199.99,
+        precioOferta: 179.99,
+        categoria: "juegos",
+        imagen: "https://picsum.photos/seed/16/400/400",
+        descripcion: "Consola portátil con pantalla HD y 60 juegos precargados.",
+        rating: 4.6,
+        reviews: 143,
+        stock: 18,
+        especificaciones: ["Pantalla 5.5\"", "60 juegos", "Batería 10h"]
+    },
+    {
+        id: 17,
+        nombre: "Set de Videojuegos Retro",
+        precio: 49.99,
+        precioOferta: 39.99,
+        categoria: "juegos",
+        imagen: "https://picsum.photos/seed/17/400/400",
+        descripcion: "Set con 120 videojuegos retro clásicos para usar en TV.",
+        rating: 4.4,
+        reviews: 76,
+        stock: 25,
+        especificaciones: ["120 juegos", "HDMI", "Control incluido"]
     }
 ];
 
@@ -365,7 +391,8 @@ const categorias = [
     { id: 'hogar', icono: 'fa-couch', nombre: 'Hogar' },
     { id: 'deportes', icono: 'fa-running', nombre: 'Deportes' },
     { id: 'libros', icono: 'fa-book', nombre: 'Libros' },
-    { id: 'juguetes', icono: 'fa-puzzle-piece', nombre: 'Juguetes' }
+    { id: 'juguetes', icono: 'fa-puzzle-piece', nombre: 'Juguetes' },
+    { id: 'juegos', icono: 'fa-gamepad', nombre: 'Juegos' }
 ];
 
 // ==================== FUNCIONES DE PRODUCTOS ====================

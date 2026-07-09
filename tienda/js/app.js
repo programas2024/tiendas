@@ -25,6 +25,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-categorias')?.addEventListener('click', abrirCategorias);
     document.getElementById('btn-carrito')?.addEventListener('click', abrirCarrito);
     document.getElementById('btn-perfil')?.addEventListener('click', abrirPerfil);
+    document.getElementById('btn-juego-azar')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.location.href = 'juegos.html';
+    });
     
     // Enter en el input de cupón
     document.getElementById('input-cupon')?.addEventListener('keypress', (e) => {
@@ -144,20 +148,29 @@ function filtrarPorCategoria(categoria) {
 function abrirCarrito() {
     renderizarCarrito();
     const modal = document.getElementById('modal-carrito');
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
+    if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+    document.body.style.overflow = 'hidden';
 }
 
 function abrirCategorias() {
     const modal = document.getElementById('modal-categorias');
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
+    if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+    document.body.style.overflow = 'hidden';
 }
 
 function abrirPerfil() {
     const modal = document.getElementById('modal-perfil');
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
+    if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+    document.body.style.overflow = 'hidden';
 }
 
 function cerrarModal(id) {
@@ -166,6 +179,7 @@ function cerrarModal(id) {
         modal.classList.add('hidden');
         modal.classList.remove('flex');
     }
+    document.body.style.overflow = '';
 }
 
 // Cerrar modal al hacer clic fuera
@@ -174,6 +188,7 @@ document.querySelectorAll('.fixed.inset-0').forEach(modal => {
         if (e.target === modal) {
             modal.classList.add('hidden');
             modal.classList.remove('flex');
+            document.body.style.overflow = '';
         }
     });
 });
@@ -389,6 +404,9 @@ document.addEventListener('keydown', (e) => {
             modal.classList.add('hidden');
             modal.classList.remove('flex');
         });
+        if (document.body.style.overflow === 'hidden') {
+            document.body.style.overflow = '';
+        }
     }
     
     if (e.ctrlKey && e.key === 'b') {
