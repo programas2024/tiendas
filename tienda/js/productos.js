@@ -89,9 +89,10 @@
                                 }
                             });
                             
-                            // También el body
-                            document.body.style.overflow = 'hidden';
-                            document.body.style.paddingRight = '0';
+                            // No bloquear el scroll de la página al mostrar notificaciones.
+                            // Solo ocultamos barras de scroll en el popup de SweetAlert si es necesario.
+                            // document.body.style.overflow = 'hidden';
+                            // document.body.style.paddingRight = '0';
                         }
                     }
                 });
