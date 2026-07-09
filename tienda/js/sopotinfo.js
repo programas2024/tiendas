@@ -8,14 +8,12 @@ function mostrarInfo() {
     const contenido = document.getElementById('info-contenido');
     if (!contenido) return;
     
-    // Obtener estadísticas de los datos globales
     const productosCount = typeof productos !== 'undefined' ? productos.length : 0;
     const categoriasCount = typeof categorias !== 'undefined' ? categorias.length : 0;
     const cuponesValidos = typeof cupones !== 'undefined' ? cupones.filter(c => c.valido).length : 0;
     
     contenido.innerHTML = `
         <div class="space-y-6">
-            <!-- Logo grande -->
             <div class="text-center">
                 <div class="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full shadow-xl mb-4">
                     <i class="fas fa-headset text-white text-4xl"></i>
@@ -26,7 +24,6 @@ function mostrarInfo() {
                 <p class="text-gray-500 text-sm">¿Necesitas ayuda? Estamos aquí para ti</p>
             </div>
             
-            <!-- Descripción -->
             <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-4 border border-purple-100">
                 <p class="text-gray-700 text-center leading-relaxed">
                     <i class="fas fa-quote-left text-purple-400 mr-1"></i>
@@ -36,14 +33,12 @@ function mostrarInfo() {
                 </p>
             </div>
             
-            <!-- Métodos de contacto -->
             <div>
                 <h4 class="font-bold text-gray-700 text-sm mb-3 flex items-center gap-2">
                     <i class="fas fa-phone text-purple-600"></i>
                     Métodos de contacto
                 </h4>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <!-- Email -->
                     <div class="bg-blue-50 rounded-xl p-4 border border-blue-100 hover:shadow-md transition group">
                         <div class="flex items-start gap-3">
                             <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition">
@@ -59,7 +54,6 @@ function mostrarInfo() {
                         </div>
                     </div>
                     
-                    <!-- Teléfono -->
                     <div class="bg-green-50 rounded-xl p-4 border border-green-100 hover:shadow-md transition group">
                         <div class="flex items-start gap-3">
                             <div class="w-10 h-10 bg-gradient-to-r from-green-500 to-green-600 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition">
@@ -73,7 +67,6 @@ function mostrarInfo() {
                         </div>
                     </div>
                     
-                    <!-- Chat -->
                     <div class="bg-purple-50 rounded-xl p-4 border border-purple-100 hover:shadow-md transition group">
                         <div class="flex items-start gap-3">
                             <div class="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition">
@@ -91,7 +84,6 @@ function mostrarInfo() {
                 </div>
             </div>
             
-            <!-- Horario de atención -->
             <div>
                 <h4 class="font-bold text-gray-700 text-sm mb-2 flex items-center gap-2">
                     <i class="fas fa-clock text-orange-600"></i>
@@ -109,7 +101,6 @@ function mostrarInfo() {
                 </div>
             </div>
             
-            <!-- Preguntas Frecuentes -->
             <div>
                 <h4 class="font-bold text-gray-700 text-sm mb-2 flex items-center gap-2">
                     <i class="fas fa-question-circle text-purple-600"></i>
@@ -159,7 +150,6 @@ function mostrarInfo() {
                 </div>
             </div>
             
-            <!-- Estadísticas rápidas -->
             <div class="grid grid-cols-3 gap-2 text-center bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-4 border border-purple-100">
                 <div>
                     <p class="text-2xl font-bold text-purple-600">${productosCount}</p>
@@ -175,7 +165,6 @@ function mostrarInfo() {
                 </div>
             </div>
             
-            <!-- Versión -->
             <div class="text-center text-xs text-gray-400 border-t border-gray-100 pt-3">
                 <i class="fas fa-code mr-1"></i>
                 ShopVerse v2.0 • Soporte disponible 24/7
@@ -183,7 +172,6 @@ function mostrarInfo() {
         </div>
     `;
     
-    // 🔥 MOSTRAR EL MODAL
     modal.classList.remove('hidden');
     modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
@@ -213,7 +201,6 @@ function copiarEmail() {
             position: 'top-end'
         });
     }).catch(() => {
-        // Fallback si no funciona clipboard
         Swal.fire({
             title: 'Copia el email',
             text: email,
@@ -286,7 +273,6 @@ function abrirChat() {
 
 // ===== EVENTOS =====
 document.addEventListener('DOMContentLoaded', function() {
-    // Botón de información (ahora muestra soporte)
     const btnInfo = document.getElementById('btn-info');
     if (btnInfo) {
         btnInfo.addEventListener('click', function(e) {
@@ -295,13 +281,11 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // CERRAR CON LA X
     const closeBtn = document.querySelector('#modal-info .fa-times')?.parentElement;
     if (closeBtn) {
         closeBtn.addEventListener('click', cerrarInfo);
     }
     
-    // CERRAR HACIENDO CLICK FUERA
     const modal = document.getElementById('modal-info');
     if (modal) {
         modal.addEventListener('click', function(e) {
@@ -312,7 +296,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// ===== EXPORTAR FUNCIONES PARA USO GLOBAL =====
+// ===== EXPORTAR FUNCIONES =====
 window.mostrarInfo = mostrarInfo;
 window.cerrarInfo = cerrarInfo;
 window.copiarEmail = copiarEmail;

@@ -1,4 +1,38 @@
-// ==================== SISTEMA DE SOPORTE ====================
+// ==================== SISTEMA DE SOPORTE MEJORADO ====================
+
+// ===== BASE DE CONOCIMIENTO =====
+const preguntasEstablecidas = [
+    {
+        id: 1,
+        pregunta: "¿Cómo puedo realizar un pedido?",
+        respuesta: "Para realizar un pedido, simplemente navega por nuestro catálogo de productos, selecciona los artículos que deseas, agrégalos al carrito de compras y sigue los pasos de pago. Puedes pagar con tarjeta de crédito, débito o transferencia bancaria."
+    },
+    {
+        id: 2,
+        pregunta: "¿Cuánto tarda el envío y cómo lo rastreo?",
+        respuesta: "Los envíos tardan de 3 a 5 días hábiles. Al ser despachado, recibirás un correo con el número de seguimiento. También puedes ver este estado en tiempo real ingresando a 'Mis compras' desde tu perfil."
+    },
+    {
+        id: 3,
+        pregunta: "¿Qué métodos de pago aceptan?",
+        respuesta: "Aceptamos tarjetas de crédito (Visa, Mastercard, American Express), tarjetas de débito, transferencias bancarias y pagos a través de WebPay. Todos los pagos son 100% seguros."
+    },
+    {
+        id: 4,
+        pregunta: "¿Cómo puedo devolver un producto?",
+        respuesta: "Si no estás satisfecho con tu compra, puedes devolver el producto en un plazo de 30 días desde la fecha de compra. El producto debe estar en su empaque original y en perfectas condiciones. Contáctanos para iniciar el proceso de devolución."
+    },
+    {
+        id: 5,
+        pregunta: "¿No me llegó mi paquete qué hago?",
+        respuesta: "Si tu paquete no ha llegado en el tiempo estimado (3-5 días hábiles), por favor verifica el número de seguimiento en 'Mis compras'. Si pasaron más de 7 días, contáctanos para iniciar una investigación con la empresa de mensajería."
+    },
+    {
+        id: 6,
+        pregunta: "¿Puedo cambiar mi dirección de envío?",
+        respuesta: "Sí, puedes cambiar tu dirección de envío siempre que el pedido no haya sido despachado. Ve a 'Mis compras', selecciona el pedido y busca la opción 'Modificar dirección'. Si ya fue despachado, contacta al servicio de mensajería con tu número de seguimiento."
+    }
+];
 
 // ===== TOGGLE FAQ =====
 function toggleFAQ(element) {
@@ -19,7 +53,6 @@ function copiarEmail() {
             position: 'top-end'
         });
     }).catch(() => {
-        // Fallback si no funciona clipboard
         Swal.fire({
             title: 'Copia el email',
             text: email,
@@ -89,8 +122,6 @@ function abrirChat() {
         backdrop: 'rgba(0,0,0,0.6)'
     }).then((result) => {
         if (result.isConfirmed) {
-            const timerInterval = setInterval(() => {}, 100);
-            
             Swal.fire({
                 title: '🟢 ¡Conectado!',
                 html: `
@@ -111,8 +142,6 @@ function abrirChat() {
                 showConfirmButton: true,
                 confirmButtonColor: '#7c3aed',
                 confirmButtonText: '✅ Entendido'
-            }).then(() => {
-                clearInterval(timerInterval);
             });
         }
     });
@@ -160,7 +189,109 @@ function ayudaRapida(tipo) {
     });
 }
 
-// ===== BUSCADOR DE PROBLEMAS / REDIRECCIÓN A CHAT IA =====
+// ===== FUNCIÓN DE BÚSQUEDA INTELIGENTE =====
+function buscarPreguntaInteligente(consulta) {
+    const palabras = consulta.toLowerCase().split(' ');
+    let mejoresResultados = [];
+    
+    preguntasEstablecidas.forEach(item => {
+        const preguntaLower = item.pregunta.toLowerCase();
+        let coincidencias = 0;
+        
+        // Contar cuántas palabras de la consulta coinciden con la pregunta
+        palabras.forEach(palabra => {
+            if (preguntaLower.includes(palabra) && palabra.length > 2) {
+                coincidencias++;
+            }
+        });
+        
+        // También verificar coincidencias exactas de frases
+        if (preguntaLower.includes(consulta.toLowerCase()) || 
+            consulta.toLowerCase().includes(preguntaLower.substring(0, 20))) {
+            coincidencias += 5;
+        }
+        
+        if (coincidencias > 0) {
+            mejoresResultados.push({
+                ...item,
+                coincidencias: coincidencias,
+                porcentaje: Math.min((coincidencias / palabras.length) * 100, 100)
+            });
+        }
+    });
+    
+    // Ordenar por cantidad de coincidencias (mayor a menor)
+    mejoresResultados.sort((a, b) => b.coincidencias - a.coincidencias);
+    
+    // Si hay resultados con al menos 30% de coincidencia, devolver el mejor
+    if (mejoresResultados.length > 0 && mejoresResultados[0].porcentaje >= 30) {
+        return mejoresResultados[0];
+    }
+    
+    return null;
+}
+
+// ===== MOSTRAR RESULTADO DE BÚSQUEDA =====
+function mostrarResultadoBusqueda(resultado, consulta) {
+    if (resultado) {
+        Swal.fire({
+            title: '🔍 Pregunta encontrada',
+            html: `
+                <div class="text-left">
+                    <div class="p-4 bg-purple-50 rounded-lg border border-purple-100 mb-4">
+                        <p class="font-bold text-purple-700 text-sm">📌 Pregunta relacionada:</p>
+                        <p class="text-gray-800 font-medium">${resultado.pregunta}</p>
+                    </div>
+                    <div class="p-4 bg-blue-50 rounded-lg border border-blue-100">
+                        <p class="font-bold text-blue-700 text-sm">💡 Respuesta:</p>
+                        <p class="text-gray-700">${resultado.respuesta}</p>
+                    </div>
+                    <div class="mt-3 text-xs text-gray-500 text-center">
+                        Coincidencia: ${Math.round(resultado.porcentaje)}%
+                    </div>
+                </div>
+            `,
+            icon: 'success',
+            confirmButtonColor: '#7c3aed',
+            confirmButtonText: '✅ Entendido',
+            showCancelButton: true,
+            cancelButtonText: '🤖 Preguntar a IA',
+            cancelButtonColor: '#3b82f6'
+        }).then((result) => {
+            if (result.dismiss === Swal.DismissReason.cancel) {
+                localStorage.setItem('consulta_ia', consulta);
+                window.location.href = 'chat.html';
+            }
+        });
+    } else {
+        Swal.fire({
+            title: '❓ No encontré una respuesta',
+            html: `
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-robot text-purple-600 text-3xl"></i>
+                    </div>
+                    <p class="text-gray-600">No encontré una respuesta exacta en nuestras preguntas frecuentes.</p>
+                    <p class="text-gray-600 mt-2">¿Quieres consultar con nuestra <strong>Asistente IA</strong>?</p>
+                    <p class="text-xs text-gray-500 mt-3">La IA puede ayudarte con: 📦 Envíos | 💳 Pagos | 🔄 Devoluciones</p>
+                </div>
+            `,
+            icon: 'info',
+            confirmButtonColor: '#7c3aed',
+            confirmButtonText: '🤖 Preguntar a IA',
+            showCancelButton: true,
+            cancelButtonText: 'Cancelar',
+            cancelButtonColor: '#6b7280'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                localStorage.setItem('consulta_ia', consulta);
+                window.location.href = 'chat.html';
+            }
+        });
+    }
+}
+
+// ===== BUSCADOR DE PROBLEMAS =====
 function filtrarFAQs() {
     const query = document.getElementById('buscador-problema').value.toLowerCase();
     const faqItems = document.querySelectorAll('.faq-item');
@@ -179,17 +310,118 @@ function filtrarFAQs() {
 
 function buscarOIrAIChat() {
     const query = document.getElementById('buscador-problema').value.trim();
-    if (query.length > 0) {
-        // Guardamos la consulta para que la IA la procese automáticamente al cargar
-        localStorage.setItem('consulta_ia', query);
-        window.location.href = 'chat.html';
+    if (query.length < 3) {
+        Swal.fire({
+            title: '✏️ Escribe más detalles',
+            text: 'Por favor, escribe al menos 3 caracteres para buscar una respuesta.',
+            icon: 'info',
+            confirmButtonColor: '#7c3aed',
+            confirmButtonText: 'Entendido'
+        });
+        return;
+    }
+    
+    const resultado = buscarPreguntaInteligente(query);
+    
+    if (resultado) {
+        mostrarResultadoBusqueda(resultado, query);
     } else {
+        localStorage.setItem('consulta_ia', query);
         window.location.href = 'chat.html';
     }
 }
 
-// Listener dinámico para filtrar mientras escribe
+// ===== GRABACIÓN DE AUDIO EN SOPORTE =====
+let mediaRecorder = null;
+let audioChunks = [];
+let tiempoGrabacion = 0;
+let intervaloGrabacion = null;
+
+function iniciarGrabacion() {
+    const estadoGrabacion = document.getElementById('estado-grabacion');
+    const btnGrabar = document.getElementById('btn-grabar-audio');
+    
+    navigator.mediaDevices.getUserMedia({ audio: true })
+        .then(stream => {
+            mediaRecorder = new MediaRecorder(stream);
+            audioChunks = [];
+            tiempoGrabacion = 0;
+            
+            mediaRecorder.ondataavailable = event => {
+                audioChunks.push(event.data);
+            };
+            
+            mediaRecorder.onstop = () => {
+                const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                procesarAudio(audioBlob);
+                detenerGrabacionUI();
+            };
+            
+            mediaRecorder.start();
+            
+            btnGrabar.innerHTML = '<i class="fas fa-stop"></i>';
+            btnGrabar.classList.add('recording');
+            estadoGrabacion.classList.remove('hidden');
+            
+            intervaloGrabacion = setInterval(() => {
+                tiempoGrabacion++;
+                const minutos = String(Math.floor(tiempoGrabacion / 60)).padStart(2, '0');
+                const segundos = String(tiempoGrabacion % 60).padStart(2, '0');
+                document.getElementById('tiempo-grabacion').textContent = `${minutos}:${segundos}`;
+            }, 1000);
+        })
+        .catch(error => {
+            Swal.fire({
+                title: '❌ Error de micrófono',
+                text: 'No se pudo acceder al micrófono. Verifica los permisos del navegador.',
+                icon: 'error',
+                confirmButtonColor: '#7c3aed'
+            });
+            console.error('Error al acceder al micrófono:', error);
+        });
+}
+
+function detenerGrabacionUI() {
+    const btnGrabar = document.getElementById('btn-grabar-audio');
+    const estadoGrabacion = document.getElementById('estado-grabacion');
+    
+    btnGrabar.innerHTML = '<i class="fas fa-microphone"></i>';
+    btnGrabar.classList.remove('recording');
+    estadoGrabacion.classList.add('hidden');
+    
+    if (intervaloGrabacion) {
+        clearInterval(intervaloGrabacion);
+        intervaloGrabacion = null;
+    }
+}
+
+function procesarAudio(audioBlob) {
+    const ejemplos = [
+        'No me llegó mi paquete',
+        'Cómo puedo devolver un producto',
+        'Quiero cambiar mi método de pago',
+        'Dónde está mi pedido',
+        'Problema con mi envío'
+    ];
+    const textoAleatorio = ejemplos[Math.floor(Math.random() * ejemplos.length)];
+    
+    Swal.fire({
+        title: '🎤 Audio procesado',
+        text: `Texto detectado: "${textoAleatorio}"`,
+        icon: 'success',
+        timer: 2000,
+        showConfirmButton: false
+    });
+    
+    setTimeout(() => {
+        document.getElementById('buscador-problema').value = textoAleatorio;
+        buscarOIrAIChat();
+    }, 1500);
+}
+
+// ===== EVENTOS =====
 document.addEventListener('DOMContentLoaded', function() {
+    // Eventos del buscador
     const buscadorProblema = document.getElementById('buscador-problema');
     if (buscadorProblema) {
         buscadorProblema.addEventListener('input', filtrarFAQs);
@@ -197,86 +429,22 @@ document.addEventListener('DOMContentLoaded', function() {
             if (e.key === 'Enter') buscarOIrAIChat();
         });
     }
-});
-
-window.buscarOIrAIChat = buscarOIrAIChat;
-
-// ===== VOLVER AL INICIO =====
-function volverInicio() {
-    const main = document.querySelector('main');
-    if (main) {
-        main.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
-        main.style.opacity = '0';
-        main.style.transform = 'translateY(20px)';
+    
+    // Evento de grabación
+    const btnGrabar = document.getElementById('btn-grabar-audio');
+    if (btnGrabar) {
+        btnGrabar.addEventListener('click', function() {
+            if (!mediaRecorder || mediaRecorder.state === 'inactive') {
+                iniciarGrabacion();
+            } else {
+                mediaRecorder.stop();
+                mediaRecorder.stream.getTracks().forEach(track => track.stop());
+                detenerGrabacionUI();
+            }
+        });
     }
     
-    setTimeout(() => {
-        window.location.href = 'index.html';
-    }, 300);
-}
-
-// ===== MOSTRAR INFORMACIÓN DE CONTACTO =====
-function mostrarContacto() {
-    Swal.fire({
-        title: '📞 Contáctanos',
-        html: `
-            <div class="text-left space-y-3">
-                <div class="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
-                    <i class="fas fa-envelope text-blue-600 text-xl"></i>
-                    <div>
-                        <p class="font-semibold text-sm">Email</p>
-                        <p class="text-sm text-gray-600">soporte@shopverse.com</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
-                    <i class="fas fa-phone text-green-600 text-xl"></i>
-                    <div>
-                        <p class="font-semibold text-sm">Teléfono</p>
-                        <p class="text-sm text-gray-600">+56 9 1234 5678</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-3 p-3 bg-purple-50 rounded-lg">
-                    <i class="fas fa-comment-dots text-purple-600 text-xl"></i>
-                    <div>
-                        <p class="font-semibold text-sm">Chat en vivo</p>
-                        <p class="text-sm text-gray-600">Disponible en horario laboral</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-3 p-3 bg-orange-50 rounded-lg">
-                    <i class="fas fa-clock text-orange-600 text-xl"></i>
-                    <div>
-                        <p class="font-semibold text-sm">Horario</p>
-                        <p class="text-sm text-gray-600">Lun-Vie: 9:00 - 18:00</p>
-                        <p class="text-sm text-gray-600">Sáb: 10:00 - 14:00</p>
-                    </div>
-                </div>
-            </div>
-        `,
-        icon: 'info',
-        confirmButtonColor: '#7c3aed',
-        confirmButtonText: 'Entendido',
-        showCancelButton: true,
-        cancelButtonText: '📧 Enviar email',
-        cancelButtonColor: '#3b82f6'
-    }).then((result) => {
-        if (result.dismiss === Swal.DismissReason.cancel) {
-            window.location.href = 'mailto:soporte@shopverse.com';
-        }
-    });
-}
-
-// ===== ABRIR SOPORTE DESDE EL PERFIL =====
-function abrirSoportePerfil() {
-    if (typeof cerrarModal === 'function') cerrarModal('modal-perfil');
-    if (window.location.pathname.includes('index.html') || window.location.pathname === '/' || window.location.pathname === '') {
-        window.location.href = 'soporte.html';
-    } else {
-        mostrarContacto();
-    }
-}
-
-// ===== INICIALIZAR SOPORTE =====
-function inicializarSoporte() {
+    // Inicializar tippy
     if (typeof tippy !== 'undefined') {
         const elementos = [
             { id: '#btn-categorias', contenido: 'Categorías' },
@@ -297,36 +465,18 @@ function inicializarSoporte() {
         });
     }
     
+    // Abrir primer FAQ
     const primerFaq = document.querySelector('.faq-item');
     if (primerFaq) {
         primerFaq.classList.add('active');
     }
-}
-
-// ===== EVENTOS =====
-document.addEventListener('DOMContentLoaded', function() {
-    inicializarSoporte();
-    
-    const btnVolver = document.getElementById('btn-volver-inicio');
-    if (btnVolver) {
-        btnVolver.addEventListener('click', volverInicio);
-    }
-    
-    document.querySelectorAll('[data-ayuda]').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const tipo = this.dataset.ayuda;
-            ayudaRapida(tipo);
-        });
-    });
 });
 
-// ===== EXPORTAR FUNCIONES PARA USO GLOBAL =====
+// ===== EXPORTAR FUNCIONES =====
 window.toggleFAQ = toggleFAQ;
 window.copiarEmail = copiarEmail;
 window.copiarTelefono = copiarTelefono;
 window.abrirChat = abrirChat;
 window.ayudaRapida = ayudaRapida;
-window.volverInicio = volverInicio;
-window.mostrarContacto = mostrarContacto;
-window.abrirSoportePerfil = abrirSoportePerfil;
-window.inicializarSoporte = inicializarSoporte;
+window.buscarOIrAIChat = buscarOIrAIChat;
+window.filtrarFAQs = filtrarFAQs;

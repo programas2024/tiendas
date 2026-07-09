@@ -50,6 +50,7 @@
         }
         .faq-item:hover {
             padding-left: 8px;
+            background-color: #faf5ff;
         }
         .faq-item .faq-pregunta {
             font-weight: 600;
@@ -100,6 +101,26 @@
         .breadcrumb .separator {
             margin: 0 8px;
         }
+
+        /* Estilos para el botón de grabación */
+        #btn-grabar-audio.recording {
+            background-color: #ef4444 !important;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* Resultado de búsqueda destacado */
+        .resultado-destacado {
+            background: linear-gradient(135deg, #faf5ff, #ede9fe);
+            border: 2px solid #8b5cf6;
+            border-radius: 12px;
+            padding: 16px;
+            margin: 8px 0;
+        }
     </style>
 </head>
 <body>
@@ -120,46 +141,29 @@
                         <i class="fas fa-search absolute right-3 top-3 text-gray-500"></i>
                     </div>
                     
-<<<<<<< HEAD
+                    <!-- Iconos de navegación (lado derecho) -->
                     <div class="flex items-center space-x-2 sm:space-x-4 flex-shrink-0">
-                        <a id="btn-volver-inicio" href="index.html" class="hover:text-purple-200 transition relative group p-1">
-                            <i class="fas fa-home text-lg sm:text-xl"></i>
-                        </a>
+                        <button id="btn-info" class="hover:text-purple-200 transition relative group p-1">
+                            <i class="fas fa-info-circle text-lg sm:text-xl"></i>
+                            <span class="tooltip-text">Soporte</span>
+                        </button>
                         <button id="btn-categorias" class="hover:text-purple-200 transition relative group p-1">
                             <i class="fas fa-th-large text-lg sm:text-xl"></i>
+                            <span class="tooltip-text">Categorías</span>
                         </button>
                         <button id="btn-carrito" class="hover:text-purple-200 transition relative group p-1">
                             <i class="fas fa-shopping-cart text-lg sm:text-xl"></i>
+                            <span class="tooltip-text">Carrito</span>
                             <span id="contador-carrito" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5">0</span>
                         </button>
                         <button id="btn-perfil" class="hover:text-purple-200 transition relative group p-1">
                             <i class="fas fa-user-circle text-lg sm:text-xl"></i>
+                            <span class="tooltip-text">Mi Perfil</span>
                         </button>
                     </div>
                 </div>
-=======
-                 <!-- Iconos de navegación -->
-<div class="flex items-center space-x-2 sm:space-x-4 flex-shrink-0">
-    <button id="btn-info" class="hover:text-purple-200 transition relative group p-1">
-        <i class="fas fa-info-circle text-lg sm:text-xl"></i>  <!-- Cambiado de info-circle a headset -->
-        <span class="tooltip-text">Soporte</span>  <!-- Cambiado el texto -->
-    </button>
-    <button id="btn-categorias" class="hover:text-purple-200 transition relative group p-1">
-        <i class="fas fa-th-large text-lg sm:text-xl"></i>
-        <span class="tooltip-text">Categorías</span>
-    </button>
-    <button id="btn-carrito" class="hover:text-purple-200 transition relative group p-1">
-        <i class="fas fa-shopping-cart text-lg sm:text-xl"></i>
-        <span class="tooltip-text">Carrito</span>
-        <span id="contador-carrito" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5">0</span>
-    </button>
-    <button id="btn-perfil" class="hover:text-purple-200 transition relative group p-1">
-        <i class="fas fa-user-circle text-lg sm:text-xl"></i>
-        <span class="tooltip-text">Mi Perfil</span>
-    </button>
-</div>
->>>>>>> 9f885af9a2c24667c7cb64b29e1a5dc609248fc0
-                
+
+                <!-- Buscador móvil -->
                 <div class="md:hidden mt-2 w-full relative">
                     <input type="text" id="buscador-movil" placeholder="Buscar productos..." 
                            class="w-full px-4 py-2.5 rounded-full text-gray-800 focus:outline-none focus:ring-2 focus:ring-purple-300 text-sm sm:text-base">
@@ -169,8 +173,7 @@
         </nav>
     </header>
 
-<<<<<<< HEAD
-=======
+
     <!-- ==================== CATEGORÍAS (Modal) ==================== -->
     <div id="modal-categorias" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center modal-overlay">
         <div class="bg-white rounded-2xl p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto modal-content">
@@ -215,21 +218,22 @@
     </div>
 
     <!-- ==================== INFORMACIÓN / SOPORTE (Modal) ==================== -->
-<div id="modal-info" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center modal-overlay">
-    <div class="bg-white rounded-2xl p-6 max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto modal-content">
-        <div class="flex justify-between items-center mb-4 sticky top-0 bg-white z-10 pb-2">
-            <h2 class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                <i class="fas fa-headset mr-2"></i>Centro de Soporte  <!-- Cambiado -->
-            </h2>
-            <button onclick="cerrarInfo()" class="text-gray-500 hover:text-gray-700 text-2xl">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div id="info-contenido">
-            <!-- Generado por JS -->
+    <div id="modal-info" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center modal-overlay">
+        <div class="bg-white rounded-2xl p-6 max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto modal-content">
+            <div class="flex justify-between items-center mb-4 sticky top-0 bg-white z-10 pb-2">
+                <h2 class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                    <i class="fas fa-headset mr-2"></i>Centro de Soporte
+                </h2>
+                <button onclick="cerrarInfo()" class="text-gray-500 hover:text-gray-700 text-2xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="info-contenido">
+                <!-- Generado por JS -->
+            </div>
         </div>
     </div>
-</div>
+
     <!-- ==================== PERFIL (Modal) ==================== -->
     <div id="modal-perfil" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center modal-overlay">
         <div class="bg-white rounded-2xl p-6 max-w-md w-full mx-4 modal-content">
@@ -259,7 +263,7 @@
     </div>
 
     <!-- ==================== CONTENIDO PRINCIPAL - SOPORTE ==================== -->
->>>>>>> 9f885af9a2c24667c7cb64b29e1a5dc609248fc0
+
     <main class="container mx-auto px-4 py-8">
         
         <div class="breadcrumb mb-6">
@@ -401,6 +405,24 @@
                             Si no estás satisfecho con tu compra, puedes devolver el producto en un plazo de 30 días desde la fecha de compra. El producto debe estar en su empaque original y en perfectas condiciones. Contáctanos para iniciar el proceso de devolución.
                         </div>
                     </div>
+                    <div class="faq-item" onclick="toggleFAQ(this)">
+                        <div class="faq-pregunta px-4 py-3">
+                            <span>¿No me llegó mi paquete qué hago?</span>
+                            <i class="fas fa-chevron-down faq-icon"></i>
+                        </div>
+                        <div class="faq-respuesta px-4 pb-3">
+                            Si tu paquete no ha llegado en el tiempo estimado (3-5 días hábiles), por favor verifica el número de seguimiento en "Mis compras". Si pasaron más de 7 días, contáctanos para iniciar una investigación con la empresa de mensajería.
+                        </div>
+                    </div>
+                    <div class="faq-item" onclick="toggleFAQ(this)">
+                        <div class="faq-pregunta px-4 py-3">
+                            <span>¿Puedo cambiar mi dirección de envío?</span>
+                            <i class="fas fa-chevron-down faq-icon"></i>
+                        </div>
+                        <div class="faq-respuesta px-4 pb-3">
+                            Sí, puedes cambiar tu dirección de envío siempre que el pedido no haya sido despachado. Ve a "Mis compras", selecciona el pedido y busca la opción "Modificar dirección". Si ya fue despachado, contacta al servicio de mensajería con tu número de seguimiento.
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -408,10 +430,21 @@
                 <label for="buscador-problema" class="block text-gray-700 font-semibold mb-2">¿No encontraste lo que buscabas? Describe tu problema:</label>
                 <div class="relative">
                     <input type="text" id="buscador-problema" placeholder="Ej: Mi pedido no llega o quiero cambiar mi tarjeta..." 
-                        class="w-full pl-5 pr-12 py-3.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-700 shadow-sm transition">
-                    <button onclick="buscarOIrAIChat()" class="absolute right-2 top-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white w-10 h-10 rounded-lg flex items-center justify-center hover:opacity-90 transition">
+                        class="w-full pl-5 pr-36 py-3.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-700 shadow-sm transition">
+                    
+                    <!-- Botón de grabación de audio -->
+                    <button id="btn-grabar-audio" class="absolute right-14 top-2 bg-red-500 hover:bg-red-600 text-white w-10 h-10 rounded-lg flex items-center justify-center transition hover:scale-105" title="Grabar audio">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                    
+                    <!-- Botón de enviar -->
+                    <button onclick="buscarOIrAIChat()" class="absolute right-2 top-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white w-10 h-10 rounded-lg flex items-center justify-center hover:opacity-90 transition hover:scale-105">
                         <i class="fas fa-paper-plane"></i>
                     </button>
+                </div>
+                <div id="estado-grabacion" class="text-xs text-gray-500 mt-2 hidden">
+                    <i class="fas fa-circle text-red-500 animate-pulse"></i> Grabando... 
+                    <span id="tiempo-grabacion">00:00</span>
                 </div>
                 <p class="text-xs text-gray-500 mt-2"><i class="fas fa-robot text-purple-500"></i> Nuestro buscador filtrará las preguntas vigentes. Si presionas enviar, nuestra <strong>Asistente IA</strong> resolverá tu caso de inmediato.</p>
             </div>
@@ -420,12 +453,8 @@
     </main>
 
     <script src="tienda/js/soporte.js"></script>
-<<<<<<< HEAD
-=======
-    <script src="tienda/js/sopotinfo.js"></script>
+    <script src="tienda/js/soportinfo.js"></script>
     <script src="tienda/js/app.js"></script>
-    
 
->>>>>>> 9f885af9a2c24667c7cb64b29e1a5dc609248fc0
 </body>
 </html>
