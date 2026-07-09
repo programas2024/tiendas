@@ -132,8 +132,6 @@ if (typeof cupones === 'undefined') {
 // Usar window.cupones para acceder desde cualquier lugar
 const cuponesGlobal = window.cupones;
 
-let cuponAplicado = null;
-
 function aplicarCupon(codigo) {
     const cupon = cuponesGlobal.find(c => c.codigo.toUpperCase() === codigo.toUpperCase());
     

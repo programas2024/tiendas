@@ -153,7 +153,6 @@ Mientras tanto, puedes verificar el estado en <b>'Mis Compras'</b> desde tu perf
 // ===== FUNCIÓN PARA MOSTRAR CALIFICACIÓN CON DELAY =====
 function mostrarCalificacion() {
     return new Promise((resolve) => {
-        // Mostrar un mensaje de espera primero
         Swal.fire({
             title: '⏳ Procesando tu consulta...',
             text: 'Preparando la calificación de tu experiencia.',
@@ -165,7 +164,6 @@ function mostrarCalificacion() {
                 Swal.showLoading();
             }
         }).then(() => {
-            // Después de 2 segundos, mostrar la calificación
             return Swal.fire({
                 title: '⭐ ¡Califica mi atención!',
                 html: `
@@ -294,38 +292,30 @@ async function enviarMensajeUsuario(event) {
                                    textoMensaje.toLowerCase().includes('buenos dias');
         
         if (!esInteraccionSimple) {
-            // Esperar 2 segundos antes de mostrar la calificación
             setTimeout(() => {
                 mostrarCalificacion();
-            }, 2000); // 2 segundos de delay
+            }, 2000);
         }
     }, 1500);
 }
 
-// ===== GRABACIÓN DE AUDIO EN EL CHAT CON RECONOCIMIENTO DE VOZ REAL =====
+// ===== GRABACIÓN DE AUDIO EN EL CHAT CON RECONOCIMIENTO DE VOZ REAL (CORREGIDO) =====
 let mediaRecorderChat = null;
 let audioChunksChat = [];
 let tiempoGrabacionChat = 0;
 let intervaloGrabacionChat = null;
-let tiempoSilencioChat = 0;
-let detectorSilencioChat = null;
 let recognitionChat = null;
 let transcripcionFinalChat = '';
+let isRecording = false;
 
 document.addEventListener('DOMContentLoaded', function() {
     const btnGrabarChat = document.getElementById('btn-grabar-audio-chat');
     if (btnGrabarChat) {
         btnGrabarChat.addEventListener('click', function() {
-            if (!mediaRecorderChat || mediaRecorderChat.state === 'inactive') {
+            if (!isRecording) {
                 iniciarGrabacionChat();
             } else {
-                mediaRecorderChat.stop();
-                mediaRecorderChat.stream.getTracks().forEach(track => track.stop());
-                detenerGrabacionChatUI();
-                if (detectorSilencioChat) {
-                    clearInterval(detectorSilencioChat);
-                    detectorSilencioChat = null;
-                }
+                detenerGrabacionChatCompleto();
             }
         });
     }
@@ -334,157 +324,196 @@ document.addEventListener('DOMContentLoaded', function() {
 function iniciarGrabacionChat() {
     const estadoGrabacion = document.getElementById('estado-grabacion-chat');
     const btnGrabar = document.getElementById('btn-grabar-audio-chat');
-    transcripcionFinalChat = '';
+    const input = document.getElementById('input-mensaje');
     
-    navigator.mediaDevices.getUserMedia({ audio: true })
-        .then(stream => {
-            mediaRecorderChat = new MediaRecorder(stream);
-            audioChunksChat = [];
-            tiempoGrabacionChat = 0;
-            tiempoSilencioChat = 0;
+    transcripcionFinalChat = '';
+    isRecording = true;
+    
+    // Verificar soporte de Speech Recognition
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    
+    if (SpeechRecognition) {
+        try {
+            recognitionChat = new SpeechRecognition();
+            recognitionChat.lang = 'es-ES';
+            recognitionChat.interimResults = true;
+            recognitionChat.continuous = true;
+            recognitionChat.maxAlternatives = 1;
             
-            // Crear analizador de audio
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const source = audioContext.createMediaStreamSource(stream);
-            const analyser = audioContext.createAnalyser();
-            analyser.fftSize = 512;
-            analyser.smoothingTimeConstant = 0.3;
-            source.connect(analyser);
-            
-            const dataArray = new Uint8Array(analyser.fftSize);
-            
-            // ===== RECONOCIMIENTO DE VOZ REAL =====
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (SpeechRecognition) {
-                recognitionChat = new SpeechRecognition();
-                recognitionChat.lang = 'es-ES';
-                recognitionChat.interimResults = true;
-                recognitionChat.continuous = true;
+            recognitionChat.onresult = function(event) {
+                let interimTranscript = '';
+                let finalTranscript = '';
                 
-                recognitionChat.onresult = (event) => {
-                    let interim = '';
-                    let final = '';
-                    for (let i = event.resultIndex; i < event.results.length; i++) {
-                        const result = event.results[i];
-                        if (result.isFinal) {
-                            final += result[0].transcript;
-                        } else {
-                            interim += result[0].transcript;
-                        }
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    const transcript = event.results[i][0].transcript;
+                    if (event.results[i].isFinal) {
+                        finalTranscript += transcript;
+                    } else {
+                        interimTranscript += transcript;
                     }
-                    if (final) transcripcionFinalChat = final.trim();
-                    // Mostrar en tiempo real en el input
-                    const input = document.getElementById('input-mensaje');
-                    if (input && (interim || final)) {
-                        input.value = (transcripcionFinalChat + ' ' + interim).trim();
-                        input.style.color = interim ? '#6b7280' : '#1f2937';
+                }
+                
+                if (finalTranscript) {
+                    transcripcionFinalChat = finalTranscript.trim();
+                }
+                
+                // Mostrar en tiempo real en el input
+                if (input) {
+                    if (transcripcionFinalChat) {
+                        input.value = transcripcionFinalChat;
+                        input.style.color = '#1f2937';
+                    } else if (interimTranscript) {
+                        input.value = interimTranscript;
+                        input.style.color = '#6b7280';
                     }
-                };
-                
-                recognitionChat.onerror = (event) => {
-                    console.warn('Error de reconocimiento chat:', event.error);
-                };
-                
-                recognitionChat.start();
-            }
-            
-            mediaRecorderChat.ondataavailable = event => {
-                audioChunksChat.push(event.data);
+                }
             };
             
-            mediaRecorderChat.onstop = () => {
-                detenerGrabacionChatUI();
-                if (audioContext.state !== 'closed') {
-                    audioContext.close();
+            recognitionChat.onerror = function(event) {
+                console.warn('Error de reconocimiento:', event.error);
+                if (event.error === 'not-allowed' || event.error === 'audio-capture') {
+                    Swal.fire({
+                        title: '⚠️ Permiso de micrófono',
+                        text: 'Por favor, permite el acceso al micrófono para usar el reconocimiento de voz.',
+                        icon: 'warning',
+                        confirmButtonColor: '#7c3aed'
+                    });
+                    detenerGrabacionChatCompleto();
                 }
-                if (recognitionChat) {
-                    recognitionChat.stop();
-                    recognitionChat = null;
-                }
-                procesarAudioChatTranscripcion();
             };
             
-            mediaRecorderChat.start();
+            recognitionChat.onend = function() {
+                // Si termina y hay texto final, procesar automáticamente
+                if (transcripcionFinalChat && isRecording) {
+                    procesarTranscripcionFinal();
+                }
+            };
             
+            // Iniciar el reconocimiento
+            recognitionChat.start();
+            
+            // Cambiar UI
             btnGrabar.innerHTML = '<i class="fas fa-stop"></i>';
             btnGrabar.classList.add('recording');
             estadoGrabacion.classList.remove('hidden');
             
             // Contador de tiempo
+            tiempoGrabacionChat = 0;
+            if (intervaloGrabacionChat) {
+                clearInterval(intervaloGrabacionChat);
+            }
             intervaloGrabacionChat = setInterval(() => {
                 tiempoGrabacionChat++;
                 const minutos = String(Math.floor(tiempoGrabacionChat / 60)).padStart(2, '0');
                 const segundos = String(tiempoGrabacionChat % 60).padStart(2, '0');
-                document.getElementById('tiempo-grabacion-chat').textContent = `${minutos}:${segundos}`;
+                const tiempoElement = document.getElementById('tiempo-grabacion-chat');
+                if (tiempoElement) {
+                    tiempoElement.textContent = `${minutos}:${segundos}`;
+                }
             }, 1000);
             
-            // Detector de silencio - 2 SEGUNDOS
-            detectorSilencioChat = setInterval(() => {
-                analyser.getByteTimeDomainData(dataArray);
-                let sum = 0;
-                for (let i = 0; i < dataArray.length; i++) {
-                    const value = (dataArray[i] - 128) / 128;
-                    sum += value * value;
+            // Detección automática de silencio (3 segundos)
+            let silencioCount = 0;
+            const detectorSilencio = setInterval(() => {
+                if (!isRecording) {
+                    clearInterval(detectorSilencio);
+                    return;
                 }
-                const rms = Math.sqrt(sum / dataArray.length);
-                const db = 20 * Math.log10(rms);
                 
-                if (db < -40) {
-                    tiempoSilencioChat++;
-                    // 2 segundos de silencio (20 iteraciones de 100ms)
-                    if (tiempoSilencioChat >= 20) {
-                        if (mediaRecorderChat && mediaRecorderChat.state === 'recording') {
-                            mediaRecorderChat.stop();
-                            mediaRecorderChat.stream.getTracks().forEach(track => track.stop());
-                            clearInterval(detectorSilencioChat);
+                // Si no hay texto en el input y han pasado 3 segundos desde la última actualización
+                if (input && input.value.trim() === '') {
+                    silencioCount++;
+                    if (silencioCount >= 30) { // 3 segundos
+                        if (recognitionChat) {
+                            // Detener automáticamente
+                            detenerGrabacionChatCompleto();
+                            clearInterval(detectorSilencio);
                         }
                     }
                 } else {
-                    tiempoSilencioChat = 0;
+                    silencioCount = 0;
                 }
             }, 100);
-        })
-        .catch(error => {
+            
+        } catch (error) {
+            console.error('Error al iniciar reconocimiento:', error);
             Swal.fire({
-                title: '❌ Error de micrófono',
-                text: 'No se pudo acceder al micrófono. Verifica los permisos del navegador.',
+                title: '❌ Error',
+                text: 'No se pudo iniciar el reconocimiento de voz.',
                 icon: 'error',
                 confirmButtonColor: '#7c3aed'
             });
-            console.error('Error al acceder al micrófono:', error);
+            isRecording = false;
+        }
+    } else {
+        Swal.fire({
+            title: '⚠️ No compatible',
+            text: 'Tu navegador no soporta reconocimiento de voz. Usa Chrome o Edge.',
+            icon: 'warning',
+            confirmButtonColor: '#7c3aed'
         });
+    }
 }
 
-function detenerGrabacionChatUI() {
+function detenerGrabacionChatCompleto() {
     const btnGrabar = document.getElementById('btn-grabar-audio-chat');
     const estadoGrabacion = document.getElementById('estado-grabacion-chat');
     
-    btnGrabar.innerHTML = '<i class="fas fa-microphone"></i>';
-    btnGrabar.classList.remove('recording');
-    estadoGrabacion.classList.add('hidden');
+    isRecording = false;
     
+    // Detener reconocimiento
+    if (recognitionChat) {
+        try {
+            recognitionChat.stop();
+        } catch (e) {
+            // Ignorar error
+        }
+        recognitionChat = null;
+    }
+    
+    // Limpiar intervalos
     if (intervaloGrabacionChat) {
         clearInterval(intervaloGrabacionChat);
         intervaloGrabacionChat = null;
     }
-    if (detectorSilencioChat) {
-        clearInterval(detectorSilencioChat);
-        detectorSilencioChat = null;
+    
+    // Actualizar UI
+    if (btnGrabar) {
+        btnGrabar.innerHTML = '<i class="fas fa-microphone"></i>';
+        btnGrabar.classList.remove('recording');
     }
-    if (recognitionChat) {
-        recognitionChat.stop();
-        recognitionChat = null;
+    if (estadoGrabacion) {
+        estadoGrabacion.classList.add('hidden');
+    }
+    
+    // Procesar transcripción final si existe
+    if (transcripcionFinalChat) {
+        procesarTranscripcionFinal();
+    } else {
+        // Si no hay texto, mostrar advertencia
+        const input = document.getElementById('input-mensaje');
+        if (input && input.value.trim() === '') {
+            Swal.fire({
+                title: '🎤 No se detectó voz',
+                text: 'No se pudo reconocer lo que dijiste. Intenta de nuevo hablando más claro.',
+                icon: 'warning',
+                timer: 2000,
+                showConfirmButton: false,
+                toast: true,
+                position: 'top-end'
+            });
+        }
     }
 }
 
-function procesarAudioChatTranscripcion() {
+function procesarTranscripcionFinal() {
     const input = document.getElementById('input-mensaje');
     const texto = transcripcionFinalChat.trim();
     
     if (!texto) {
         Swal.fire({
             title: '🎤 No se detectó voz',
-            text: 'No se pudo reconocer lo que dijiste. Intenta de nuevo hablando más claro.',
+            text: 'No se pudo reconocer lo que dijiste. Intenta de nuevo.',
             icon: 'warning',
             timer: 2000,
             showConfirmButton: false,
@@ -505,13 +534,15 @@ function procesarAudioChatTranscripcion() {
     });
     
     setTimeout(() => {
-        input.value = texto;
-        input.style.color = '#1f2937';
-        // Auto-enviar después de 800ms
-        setTimeout(() => {
-            const event = new Event('submit', { cancelable: true });
-            document.getElementById('form-chat').dispatchEvent(event);
-        }, 800);
+        if (input) {
+            input.value = texto;
+            input.style.color = '#1f2937';
+            // Auto-enviar después de 800ms
+            setTimeout(() => {
+                const event = new Event('submit', { cancelable: true });
+                document.getElementById('form-chat').dispatchEvent(event);
+            }, 800);
+        }
     }, 800);
 }
 
@@ -659,3 +690,5 @@ window.mostrarIndicadorEscribiendo = mostrarIndicadorEscribiendo;
 window.removerIndicadorEscribiendo = removerIndicadorEscribiendo;
 window.eliminarImagen = eliminarImagen;
 window.mostrarCalificacion = mostrarCalificacion;
+window.iniciarGrabacionChat = iniciarGrabacionChat;
+window.detenerGrabacionChatCompleto = detenerGrabacionChatCompleto;

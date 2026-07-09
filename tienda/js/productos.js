@@ -396,6 +396,12 @@ const categorias = [
     { id: 'juegos', icono: 'fa-gamepad', nombre: 'Juegos' }
 ];
 
+const cupones = [
+    { codigo: 'BIENVENIDA10', descuento: 10, valido: true, usado: false },
+    { codigo: 'SHOP20', descuento: 20, valido: true, usado: false },
+    { codigo: 'FLASH30', descuento: 30, valido: false, usado: false }
+];
+
 // ==================== FUNCIONES DE PRODUCTOS ====================
 function obtenerProductosPorCategoria(categoria) {
     if (categoria === 'todos') return productos;

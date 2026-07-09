@@ -108,7 +108,7 @@ function buscarPreguntaInteligente(consulta) {
         
         // 3. Bonificación por contexto detectado
         if (esSobreDemora && item.contexto === 'envio') {
-            puntaje += 6; // Fuerte bonificación para consultas de demora → envío
+            puntaje += 6;
         }
         if (esSobreDano && item.contexto === 'devolucion') {
             puntaje += 5;
@@ -124,19 +124,15 @@ function buscarPreguntaInteligente(consulta) {
         }
         
         // 4. Penalización por contexto INCORRECTO
-        // Si habla de daño/roto pero NO es devolución → penalizar fuerte
         if (esSobreDano && item.contexto !== 'devolucion') {
             puntaje -= 6;
         }
-        // Si habla de demora/envío pero es pregunta de pago → penalizar
         if ((esSobreDemora || esSobreEnvio) && item.contexto === 'pago') {
             puntaje -= 5;
         }
-        // Si habla de devolución pero es pregunta de envío → penalizar
         if (esSobreDevolucion && item.contexto === 'envio' && !esSobreEnvio) {
             puntaje -= 4;
         }
-        // Si habla de pago pero es pregunta de envío → penalizar
         if (esSobrePago && item.contexto === 'envio') {
             puntaje -= 4;
         }
@@ -158,7 +154,7 @@ function buscarPreguntaInteligente(consulta) {
         return mejoresResultados[0];
     }
     
-    return null; // No hay coincidencia suficiente
+    return null;
 }
 
 // ===== MOSTRAR RESULTADO DE BÚSQUEDA =====
@@ -384,6 +380,68 @@ function iniciarGrabacion() {
         });
 }
 
+// ===== FUNCIÓN COPIAR EMAIL CORREGIDA =====
+function copiarEmail(email) {
+    // Si no se pasa email, usar el predeterminado
+    if (!email) email = 'soporte@shopverse.com';
+    
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(email).then(() => {
+            mostrarToast('📧 Email copiado', 'El email ha sido copiado al portapapeles', 'success');
+        }).catch(() => {
+            copiarEmailFallback(email);
+        });
+    } else {
+        copiarEmailFallback(email);
+    }
+}
+
+function copiarEmailFallback(email) {
+    try {
+        const textArea = document.createElement('textarea');
+        textArea.value = email;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-9999px';
+        textArea.style.top = '-9999px';
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        
+        mostrarToast('📧 Email copiado', 'El email ha sido copiado al portapapeles', 'success');
+    } catch (error) {
+        // Si falla, mostrar el email para copiar manualmente
+        Swal.fire({
+            title: '📧 Copia el email',
+            text: email,
+            icon: 'info',
+            confirmButtonColor: '#7c3aed',
+            confirmButtonText: 'Copiar',
+            showCancelButton: true,
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                navigator.clipboard.writeText(email).catch(() => {
+                    prompt('Copia el email:', email);
+                });
+            }
+        });
+    }
+}
+
+// ===== FUNCIÓN PARA MOSTRAR TOASTS =====
+function mostrarToast(title, text, icon = 'success') {
+    Swal.fire({
+        title: title,
+        text: text,
+        icon: icon,
+        timer: 2000,
+        showConfirmButton: false,
+        toast: true,
+        position: 'top-end'
+    });
+}
+
 function detenerGrabacionUI() {
     const btnGrabar = document.getElementById('btn-grabar-audio');
     const estadoGrabacion = document.getElementById('estado-grabacion');
@@ -444,8 +502,125 @@ function procesarAudioTranscripcion() {
     }, 800);
 }
 
-// ===== EVENTOS =====
+// ===== AYUDA RÁPIDA =====
+function ayudaRapida(tipo) {
+    const preguntas = {
+        'estado-envio': preguntasEstablecidas[1],
+        'devolucion': preguntasEstablecidas[3],
+        'pago': preguntasEstablecidas[2]
+    };
+    
+    const resultado = preguntas[tipo];
+    if (resultado) {
+        mostrarResultadoBusqueda(resultado, resultado.pregunta);
+    }
+}
+
+// ===== COPIAR TELÉFONO =====
+function copiarTelefono() {
+    const telefono = '+56 9 1234 5678';
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(telefono).then(() => {
+            mostrarToast('📱 Teléfono copiado', 'El teléfono ha sido copiado al portapapeles', 'success');
+        }).catch(() => {
+            prompt('Copia el teléfono:', telefono);
+        });
+    } else {
+        prompt('Copia el teléfono:', telefono);
+    }
+}
+
+// ===== FUNCIONES DE FAQ =====
+function toggleFAQ(elemento) {
+    if (!elemento) return;
+    elemento.classList.toggle('active');
+    const icono = elemento.querySelector('.faq-icon');
+    if (icono) {
+        icono.style.transform = elemento.classList.contains('active') ? 'rotate(180deg)' : 'rotate(0deg)';
+    }
+}
+
+// ===== FILTRAR FAQs EN TIEMPO REAL =====
+function filtrarFAQs() {
+    const input = document.getElementById('buscador-problema');
+    if (!input) return;
+    const query = input.value.trim().toLowerCase();
+    const faqItems = document.querySelectorAll('.faq-item');
+    
+    if (query.length < 2) {
+        // Mostrar todas si no hay búsqueda
+        faqItems.forEach(item => {
+            item.style.display = '';
+            item.classList.remove('active');
+        });
+        if (faqItems.length > 0) {
+            faqItems[0].classList.add('active');
+        }
+        return;
+    }
+    
+    let mejorPuntaje = -1;
+    let mejorFaq = null;
+    
+    faqItems.forEach(item => {
+        const pregunta = item.querySelector('.faq-pregunta span');
+        const respuesta = item.querySelector('.faq-respuesta');
+        if (!pregunta) return;
+        
+        const textoPregunta = pregunta.textContent.toLowerCase();
+        const textoRespuesta = respuesta ? respuesta.textContent.toLowerCase() : '';
+        const textoCompleto = textoPregunta + ' ' + textoRespuesta;
+        
+        let puntaje = 0;
+        const palabras = query.split(/\s+/);
+        
+        palabras.forEach(palabra => {
+            if (palabra.length < 2) return;
+            if (textoPregunta.includes(palabra)) puntaje += 3;
+            if (textoRespuesta.includes(palabra)) puntaje += 1;
+        });
+        
+        if (textoCompleto.includes(query)) puntaje += 5;
+        
+        if (puntaje > 0) {
+            item.style.display = '';
+            if (puntaje > mejorPuntaje) {
+                mejorPuntaje = puntaje;
+                mejorFaq = item;
+            }
+        } else {
+            item.style.display = 'none';
+        }
+        
+        if (item !== mejorFaq) {
+            item.classList.remove('active');
+            const icono = item.querySelector('.faq-icon');
+            if (icono) icono.style.transform = 'rotate(0deg)';
+        }
+    });
+    
+    if (mejorFaq && mejorPuntaje > 0) {
+        mejorFaq.classList.add('active');
+        const icono = mejorFaq.querySelector('.faq-icon');
+        if (icono) icono.style.transform = 'rotate(180deg)';
+        mejorFaq.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+}
+
+// ===== FUNCIÓN PARA ABRIR CHAT =====
+function abrirChat() {
+    // Si hay texto en el buscador, pasarlo al chat
+    const input = document.getElementById('buscador-problema');
+    if (input && input.value.trim()) {
+        localStorage.setItem('consulta_ia', input.value.trim());
+    }
+    window.location.href = 'chat.html';
+}
+
+// ===== INICIALIZACIÓN =====
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('🔧 Sistema de soporte inicializado');
+    
     // Eventos del buscador
     const buscadorProblema = document.getElementById('buscador-problema');
     if (buscadorProblema) {
@@ -501,137 +676,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// ===== FUNCIONES DE FAQ =====
-function toggleFAQ(elemento) {
-    elemento.classList.toggle('active');
-    const icono = elemento.querySelector('.faq-icon');
-    if (icono) {
-        if (elemento.classList.contains('active')) {
-            icono.style.transform = 'rotate(180deg)';
-        } else {
-            icono.style.transform = 'rotate(0deg)';
-        }
-    }
-}
-
-// ===== FILTRAR FAQs EN TIEMPO REAL =====
-function filtrarFAQs() {
-    const input = document.getElementById('buscador-problema');
-    if (!input) return;
-    const query = input.value.trim().toLowerCase();
-    const faqItems = document.querySelectorAll('.faq-item');
-    
-    if (query.length < 2) {
-        // Mostrar todas si no hay búsqueda
-        faqItems.forEach(item => {
-            item.style.display = '';
-            item.classList.remove('active');
-        });
-        // Resaltar la primera
-        if (faqItems.length > 0) {
-            faqItems[0].classList.add('active');
-        }
-        return;
-    }
-    
-    let mejorPuntaje = -1;
-    let mejorFaq = null;
-    
-    faqItems.forEach(item => {
-        const pregunta = item.querySelector('.faq-pregunta span');
-        const respuesta = item.querySelector('.faq-respuesta');
-        if (!pregunta) return;
-        
-        const textoPregunta = pregunta.textContent.toLowerCase();
-        const textoRespuesta = respuesta ? respuesta.textContent.toLowerCase() : '';
-        const textoCompleto = textoPregunta + ' ' + textoRespuesta;
-        
-        // Calcular puntaje de coincidencia
-        let puntaje = 0;
-        const palabras = query.split(/\s+/);
-        
-        palabras.forEach(palabra => {
-            if (palabra.length < 2) return;
-            if (textoPregunta.includes(palabra)) puntaje += 3;
-            if (textoRespuesta.includes(palabra)) puntaje += 1;
-        });
-        
-        // Coincidencia exacta de frase
-        if (textoCompleto.includes(query)) puntaje += 5;
-        
-        if (puntaje > 0) {
-            item.style.display = '';
-            if (puntaje > mejorPuntaje) {
-                mejorPuntaje = puntaje;
-                mejorFaq = item;
-            }
-        } else {
-            item.style.display = 'none';
-        }
-        
-        // Cerrar todas menos la mejor
-        if (item !== mejorFaq) {
-            item.classList.remove('active');
-            const icono = item.querySelector('.faq-icon');
-            if (icono) icono.style.transform = 'rotate(0deg)';
-        }
-    });
-    
-    // Expandir la mejor coincidencia
-    if (mejorFaq && mejorPuntaje > 0) {
-        mejorFaq.classList.add('active');
-        const icono = mejorFaq.querySelector('.faq-icon');
-        if (icono) icono.style.transform = 'rotate(180deg)';
-        // Hacer scroll hacia la FAQ
-        mejorFaq.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-}
-
-// ===== AYUDA RÁPIDA =====
-function ayudaRapida(tipo) {
-    const preguntas = {
-        'estado-envio': preguntasEstablecidas[1],  // ¿Cuánto tarda el envío?
-        'devolucion': preguntasEstablecidas[3],     // ¿Cómo puedo devolver?
-        'pago': preguntasEstablecidas[2]            // ¿Qué métodos de pago?
-    };
-    
-    const resultado = preguntas[tipo];
-    if (resultado) {
-        mostrarResultadoBusqueda(resultado, resultado.pregunta);
-    }
-}
-
-// ===== COPIAR TELÉFONO =====
-function copiarTelefono() {
-    const telefono = '+56 9 1234 5678';
-    navigator.clipboard.writeText(telefono).then(() => {
-        Swal.fire({
-            icon: 'success',
-            title: '¡Copiado!',
-            text: 'El teléfono ha sido copiado al portapapeles',
-            timer: 1500,
-            showConfirmButton: false,
-            toast: true,
-            position: 'top-end'
-        });
-    }).catch(() => {
-        Swal.fire({
-            title: 'Copia el teléfono',
-            text: telefono,
-            icon: 'info',
-            confirmButtonColor: '#7c3aed',
-            confirmButtonText: 'Copiar',
-            showCancelButton: true,
-            cancelButtonText: 'Cancelar'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                prompt('Copia el teléfono:', telefono);
-            }
-        });
-    });
-}
-
-// ===== EXPORTAR FUNCIONES =====
+// ===== EXPORTAR FUNCIONES PARA USO GLOBAL =====
 window.toggleFAQ = toggleFAQ;
 window.copiarEmail = copiarEmail;
 window.copiarTelefono = copiarTelefono;
@@ -639,3 +684,6 @@ window.abrirChat = abrirChat;
 window.ayudaRapida = ayudaRapida;
 window.buscarOIrAIChat = buscarOIrAIChat;
 window.filtrarFAQs = filtrarFAQs;
+window.mostrarToast = mostrarToast;
+
+console.log('✅ Funciones de soporte cargadas correctamente');
