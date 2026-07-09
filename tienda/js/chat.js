@@ -10,7 +10,7 @@ const TEMAS_PERMITIDOS = [
     'usuario', 'cuenta', 'perfil', 'registro', 'sesion',
     'soporte', 'ayuda', 'atencion', 'problema', 'inconveniente',
     'seguimiento', 'rastrear', 'codigo', 'tracking',
-    'factura', 'boleta', 'comprobante',
+    'factura', 'boleta', 'comprobante', 'dañado', 'roto', 'defectuoso',
     'mensajeria', 'correo', 'chile', 'santiago'
 ];
 
@@ -46,7 +46,6 @@ function esTemaPermitido(texto) {
     const palabrasClave = ['como', 'que', 'donde', 'cuando', 'porque', 'para', 'cual', 'puedo', 'puede'];
     for (let palabra of palabrasClave) {
         if (textoLower.startsWith(palabra)) {
-            // Verificar si tiene palabras relacionadas con compras
             if (textoLower.includes('compra') || textoLower.includes('producto') || 
                 textoLower.includes('tienda') || textoLower.includes('shop') ||
                 textoLower.includes('comprar') || textoLower.includes('precio')) {
@@ -76,7 +75,22 @@ function procesarIntencionIA(entrada) {
     
     // Despedidas
     if (frase.includes('chao') || frase.includes('adios') || frase.includes('bye') || frase.includes('gracias')) {
-        return `¡Fue un placer ayudarte! 🙌 Si necesitas algo más, aquí estaré. ¡Que tengas un excelente día! 🌟 No olvides calificar mi atención al final. ⭐⭐⭐⭐⭐`;
+        return `¡Fue un placer ayudarte! 🙌 Si necesitas algo más, aquí estaré. ¡Que tengas un excelente día! 🌟`;
+    }
+    
+    // Producto dañado o defectuoso
+    if (frase.includes('dañado') || frase.includes('roto') || frase.includes('defectuoso') || 
+        frase.includes('maltratado') || frase.includes('golpeado') || frase.includes('quebrado')) {
+        return `😔 Lamento mucho que tu producto haya llegado en mal estado. 
+
+📋 Por favor, sigue estos pasos:
+1️⃣ Toma fotos del producto dañado
+2️⃣ Toma fotos del empaque y la caja
+3️⃣ Envía las fotos a soporte@shopverse.com con tu número de pedido
+
+🔄 Te ofreceremos un reemplazo completo o un reembolso en un plazo máximo de 48 horas.
+
+¿Necesitas que te ayude con algo más? 🤝`;
     }
     
     // Pedidos y envíos
@@ -109,7 +123,7 @@ function procesarIntencionIA(entrada) {
         return `👤 Puedes gestionar tu cuenta en el perfil de usuario. Desde allí puedes ver tus compras, favoritos, y configurar tus datos. 🔐 ¿Necesitas ayuda con algo específico de tu cuenta?`;
     }
     
-    // Respuesta por defecto si no se entiende pero es tema permitido
+    // Respuesta por defecto
     return `🤔 Entiendo tu consulta. Déjame analizarla mejor... 🧠
 
 📌 Para ayudarte mejor, ¿podrías darme más detalles sobre tu situación? Puedo asistirte con:
@@ -118,83 +132,98 @@ function procesarIntencionIA(entrada) {
 • 🔄 Devoluciones y cambios
 • 🛍️ Información de productos
 • 👤 Gestión de cuenta
+• 📦 Productos dañados o defectuosos
 
 ¡Estoy aquí para ayudarte! 😊✨`;
 }
 
-// ===== FUNCIÓN PARA MOSTRAR CALIFICACIÓN =====
+// ===== FUNCIÓN PARA MOSTRAR CALIFICACIÓN CON DELAY =====
 function mostrarCalificacion() {
     return new Promise((resolve) => {
+        // Mostrar un mensaje de espera primero
         Swal.fire({
-            title: '⭐ ¡Califica mi atención!',
-            html: `
-                <div class="text-center">
-                    <p class="text-gray-600 mb-4">¿Cómo fue tu experiencia conmigo?</p>
-                    <div id="rating-estrellas" class="flex justify-center gap-2 text-3xl mb-4">
-                        <i class="fas fa-star text-gray-300 cursor-pointer hover:text-yellow-400 transition" data-rating="1"></i>
-                        <i class="fas fa-star text-gray-300 cursor-pointer hover:text-yellow-400 transition" data-rating="2"></i>
-                        <i class="fas fa-star text-gray-300 cursor-pointer hover:text-yellow-400 transition" data-rating="3"></i>
-                        <i class="fas fa-star text-gray-300 cursor-pointer hover:text-yellow-400 transition" data-rating="4"></i>
-                        <i class="fas fa-star text-gray-300 cursor-pointer hover:text-yellow-400 transition" data-rating="5"></i>
-                    </div>
-                    <div id="rating-seleccionado" class="text-sm text-gray-500 mb-3">Selecciona una calificación</div>
-                    <div class="mt-3">
-                        <textarea id="comentario-calificacion" placeholder="Comentario opcional..." 
-                            class="w-full p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm" 
-                            rows="3"></textarea>
-                    </div>
-                </div>
-            `,
-            showConfirmButton: true,
-            confirmButtonText: '✅ Enviar calificación',
-            confirmButtonColor: '#7c3aed',
-            showCancelButton: true,
-            cancelButtonText: 'Omitir',
-            cancelButtonColor: '#6b7280',
+            title: '⏳ Procesando tu consulta...',
+            text: 'Preparando la calificación de tu experiencia.',
+            icon: 'info',
+            timer: 2000,
+            showConfirmButton: false,
+            allowOutsideClick: false,
             didOpen: () => {
-                let ratingSeleccionado = 0;
-                const estrellas = document.querySelectorAll('#rating-estrellas i');
-                const textoSeleccionado = document.getElementById('rating-seleccionado');
-                
-                estrellas.forEach(estrella => {
-                    estrella.addEventListener('click', function() {
-                        ratingSeleccionado = parseInt(this.dataset.rating);
-                        estrellas.forEach((e, index) => {
-                            if (index < ratingSeleccionado) {
-                                e.className = 'fas fa-star text-yellow-400';
-                            } else {
-                                e.className = 'fas fa-star text-gray-300';
-                            }
-                        });
-                        textoSeleccionado.textContent = `⭐ ${ratingSeleccionado} de 5 estrellas`;
-                        textoSeleccionado.className = 'text-sm text-yellow-600 font-semibold mb-3';
-                    });
-                    
-                    estrella.addEventListener('mouseenter', function() {
-                        const hoverRating = parseInt(this.dataset.rating);
-                        estrellas.forEach((e, index) => {
-                            if (index < hoverRating) {
-                                e.className = 'fas fa-star text-yellow-200';
-                            }
-                        });
-                    });
-                    
-                    estrella.addEventListener('mouseleave', function() {
-                        estrellas.forEach((e, index) => {
-                            if (index < ratingSeleccionado) {
-                                e.className = 'fas fa-star text-yellow-400';
-                            } else {
-                                e.className = 'fas fa-star text-gray-300';
-                            }
-                        });
-                    });
-                });
-            },
-            preConfirm: () => {
-                const rating = document.querySelectorAll('#rating-estrellas i.text-yellow-400').length;
-                const comentario = document.getElementById('comentario-calificacion').value;
-                return { rating, comentario };
+                Swal.showLoading();
             }
+        }).then(() => {
+            // Después de 2 segundos, mostrar la calificación
+            return Swal.fire({
+                title: '⭐ ¡Califica mi atención!',
+                html: `
+                    <div class="text-center">
+                        <p class="text-gray-600 mb-4">¿Cómo fue tu experiencia conmigo?</p>
+                        <div id="rating-estrellas" class="flex justify-center gap-2 text-3xl mb-4">
+                            <i class="fas fa-star text-gray-300 cursor-pointer hover:text-yellow-400 transition" data-rating="1"></i>
+                            <i class="fas fa-star text-gray-300 cursor-pointer hover:text-yellow-400 transition" data-rating="2"></i>
+                            <i class="fas fa-star text-gray-300 cursor-pointer hover:text-yellow-400 transition" data-rating="3"></i>
+                            <i class="fas fa-star text-gray-300 cursor-pointer hover:text-yellow-400 transition" data-rating="4"></i>
+                            <i class="fas fa-star text-gray-300 cursor-pointer hover:text-yellow-400 transition" data-rating="5"></i>
+                        </div>
+                        <div id="rating-seleccionado" class="text-sm text-gray-500 mb-3">Selecciona una calificación</div>
+                        <div class="mt-3">
+                            <textarea id="comentario-calificacion" placeholder="Comentario opcional..." 
+                                class="w-full p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm" 
+                                rows="3"></textarea>
+                        </div>
+                    </div>
+                `,
+                showConfirmButton: true,
+                confirmButtonText: '✅ Enviar calificación',
+                confirmButtonColor: '#7c3aed',
+                showCancelButton: true,
+                cancelButtonText: 'Omitir',
+                cancelButtonColor: '#6b7280',
+                didOpen: () => {
+                    let ratingSeleccionado = 0;
+                    const estrellas = document.querySelectorAll('#rating-estrellas i');
+                    const textoSeleccionado = document.getElementById('rating-seleccionado');
+                    
+                    estrellas.forEach(estrella => {
+                        estrella.addEventListener('click', function() {
+                            ratingSeleccionado = parseInt(this.dataset.rating);
+                            estrellas.forEach((e, index) => {
+                                if (index < ratingSeleccionado) {
+                                    e.className = 'fas fa-star text-yellow-400';
+                                } else {
+                                    e.className = 'fas fa-star text-gray-300';
+                                }
+                            });
+                            textoSeleccionado.textContent = `⭐ ${ratingSeleccionado} de 5 estrellas`;
+                            textoSeleccionado.className = 'text-sm text-yellow-600 font-semibold mb-3';
+                        });
+                        
+                        estrella.addEventListener('mouseenter', function() {
+                            const hoverRating = parseInt(this.dataset.rating);
+                            estrellas.forEach((e, index) => {
+                                if (index < hoverRating) {
+                                    e.className = 'fas fa-star text-yellow-200';
+                                }
+                            });
+                        });
+                        
+                        estrella.addEventListener('mouseleave', function() {
+                            estrellas.forEach((e, index) => {
+                                if (index < ratingSeleccionado) {
+                                    e.className = 'fas fa-star text-yellow-400';
+                                } else {
+                                    e.className = 'fas fa-star text-gray-300';
+                                }
+                            });
+                        });
+                    });
+                },
+                preConfirm: () => {
+                    const rating = document.querySelectorAll('#rating-estrellas i.text-yellow-400').length;
+                    const comentario = document.getElementById('comentario-calificacion').value;
+                    return { rating, comentario };
+                }
+            });
         }).then((result) => {
             if (result.isConfirmed) {
                 const { rating, comentario } = result.value;
@@ -244,8 +273,7 @@ async function enviarMensajeUsuario(event) {
         const respuestaIA = procesarIntencionIA(textoMensaje);
         agregarBurbuja(respuestaIA, false);
         
-        // 4. Mostrar calificación después de la respuesta
-        // Solo si no es un saludo o despedida simple
+        // 4. Mostrar calificación después de la respuesta (con delay de 2 segundos)
         const esInteraccionSimple = textoMensaje.toLowerCase().includes('hola') || 
                                    textoMensaje.toLowerCase().includes('gracias') ||
                                    textoMensaje.toLowerCase().includes('chao') ||
@@ -253,65 +281,177 @@ async function enviarMensajeUsuario(event) {
                                    textoMensaje.toLowerCase().includes('buenos dias');
         
         if (!esInteraccionSimple) {
+            // Esperar 2 segundos antes de mostrar la calificación
             setTimeout(() => {
                 mostrarCalificacion();
-            }, 1000);
+            }, 2000); // 2 segundos de delay
         }
     }, 1500);
 }
 
-function agregarBurbuja(texto, esUsuario) {
-    const cajaMensajes = document.getElementById('caja-mensajes');
-    const divMensaje = document.createElement('div');
-    
-    if (esUsuario) {
-        divMensaje.className = "flex items-start gap-2.5 max-w-[85%] ml-auto justify-end";
-        divMensaje.innerHTML = `
-            <div class="flex flex-col w-full leading-1.5 p-4 bg-gradient-to-br from-blue-600 to-purple-600 text-white shadow-md rounded-xl bubble-user">
-                <p class="text-sm font-normal">${texto}</p>
-                <span class="text-[10px] text-purple-200 mt-1 text-right">Enviado</span>
-            </div>
-        `;
-    } else {
-        divMensaje.className = "flex items-start gap-2.5 max-w-[85%]";
-        divMensaje.innerHTML = `
-            <div class="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center text-sm shadow flex-shrink-0">
-                <i class="fas fa-robot"></i>
-            </div>
-            <div class="flex flex-col w-full leading-1.5 p-4 bg-white shadow-sm border border-gray-100 rounded-xl bubble-ia">
-                <p class="text-sm font-normal text-gray-800">${texto}</p>
-                <span class="text-[10px] text-gray-400 mt-1 text-right">IA Asistente</span>
-            </div>
-        `;
+// ===== GRABACIÓN DE AUDIO EN EL CHAT CON AUTO-ENVÍO =====
+let mediaRecorderChat = null;
+let audioChunksChat = [];
+let tiempoGrabacionChat = 0;
+let intervaloGrabacionChat = null;
+let tiempoSilencioChat = 0;
+let detectorSilencioChat = null;
+
+document.addEventListener('DOMContentLoaded', function() {
+    const btnGrabarChat = document.getElementById('btn-grabar-audio-chat');
+    if (btnGrabarChat) {
+        btnGrabarChat.addEventListener('click', function() {
+            if (!mediaRecorderChat || mediaRecorderChat.state === 'inactive') {
+                iniciarGrabacionChat();
+            } else {
+                mediaRecorderChat.stop();
+                mediaRecorderChat.stream.getTracks().forEach(track => track.stop());
+                detenerGrabacionChatUI();
+                if (detectorSilencioChat) {
+                    clearInterval(detectorSilencioChat);
+                    detectorSilencioChat = null;
+                }
+            }
+        });
     }
+});
+
+function iniciarGrabacionChat() {
+    const estadoGrabacion = document.getElementById('estado-grabacion-chat');
+    const btnGrabar = document.getElementById('btn-grabar-audio-chat');
     
-    cajaMensajes.appendChild(divMensaje);
-    cajaMensajes.scrollTop = cajaMensajes.scrollHeight;
+    navigator.mediaDevices.getUserMedia({ audio: true })
+        .then(stream => {
+            mediaRecorderChat = new MediaRecorder(stream);
+            audioChunksChat = [];
+            tiempoGrabacionChat = 0;
+            tiempoSilencioChat = 0;
+            
+            // Crear analizador de audio
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const source = audioContext.createMediaStreamSource(stream);
+            const analyser = audioContext.createAnalyser();
+            analyser.fftSize = 512;
+            analyser.smoothingTimeConstant = 0.3;
+            source.connect(analyser);
+            
+            const dataArray = new Uint8Array(analyser.fftSize);
+            
+            mediaRecorderChat.ondataavailable = event => {
+                audioChunksChat.push(event.data);
+            };
+            
+            mediaRecorderChat.onstop = () => {
+                const audioBlob = new Blob(audioChunksChat, { type: 'audio/wav' });
+                procesarAudioChat(audioBlob);
+                detenerGrabacionChatUI();
+                if (audioContext.state !== 'closed') {
+                    audioContext.close();
+                }
+            };
+            
+            mediaRecorderChat.start();
+            
+            btnGrabar.innerHTML = '<i class="fas fa-stop"></i>';
+            btnGrabar.classList.add('recording');
+            estadoGrabacion.classList.remove('hidden');
+            
+            // Contador de tiempo
+            intervaloGrabacionChat = setInterval(() => {
+                tiempoGrabacionChat++;
+                const minutos = String(Math.floor(tiempoGrabacionChat / 60)).padStart(2, '0');
+                const segundos = String(tiempoGrabacionChat % 60).padStart(2, '0');
+                document.getElementById('tiempo-grabacion-chat').textContent = `${minutos}:${segundos}`;
+            }, 1000);
+            
+            // Detector de silencio
+            detectorSilencioChat = setInterval(() => {
+                analyser.getByteTimeDomainData(dataArray);
+                let sum = 0;
+                for (let i = 0; i < dataArray.length; i++) {
+                    const value = (dataArray[i] - 128) / 128;
+                    sum += value * value;
+                }
+                const rms = Math.sqrt(sum / dataArray.length);
+                const db = 20 * Math.log10(rms);
+                
+                if (db < -40) {
+                    tiempoSilencioChat++;
+                    if (tiempoSilencioChat >= 10) { // 1 segundo de silencio
+                        if (mediaRecorderChat && mediaRecorderChat.state === 'recording') {
+                            mediaRecorderChat.stop();
+                            mediaRecorderChat.stream.getTracks().forEach(track => track.stop());
+                            detenerGrabacionChatUI();
+                            if (audioContext.state !== 'closed') {
+                                audioContext.close();
+                            }
+                            clearInterval(detectorSilencioChat);
+                        }
+                    }
+                } else {
+                    tiempoSilencioChat = 0;
+                }
+            }, 100);
+        })
+        .catch(error => {
+            Swal.fire({
+                title: '❌ Error de micrófono',
+                text: 'No se pudo acceder al micrófono. Verifica los permisos del navegador.',
+                icon: 'error',
+                confirmButtonColor: '#7c3aed'
+            });
+            console.error('Error al acceder al micrófono:', error);
+        });
 }
 
-function mostrarIndicadorEscribiendo() {
-    const cajaMensajes = document.getElementById('caja-mensajes');
-    const id = "escribiendo-" + Date.now();
-    const divIndicador = document.createElement('div');
-    divIndicador.id = id;
-    divIndicador.className = "flex items-start gap-2.5 max-w-[85%]";
-    divIndicador.innerHTML = `
-        <div class="w-8 h-8 rounded-full bg-purple-200 text-purple-700 flex items-center justify-center text-sm flex-shrink-0">
-            <i class="fas fa-robot"></i>
-        </div>
-        <div class="p-3 bg-gray-100 rounded-xl text-gray-500 text-xs flex items-center gap-1">
-            <span>Escribiendo</span>
-            <span class="animate-ping">.</span><span class="animate-ping delay-150">.</span><span class="animate-ping delay-300">.</span>
-        </div>
-    `;
-    cajaMensajes.appendChild(divIndicador);
-    cajaMensajes.scrollTop = cajaMensajes.scrollHeight;
-    return id;
+function detenerGrabacionChatUI() {
+    const btnGrabar = document.getElementById('btn-grabar-audio-chat');
+    const estadoGrabacion = document.getElementById('estado-grabacion-chat');
+    
+    btnGrabar.innerHTML = '<i class="fas fa-microphone"></i>';
+    btnGrabar.classList.remove('recording');
+    estadoGrabacion.classList.add('hidden');
+    
+    if (intervaloGrabacionChat) {
+        clearInterval(intervaloGrabacionChat);
+        intervaloGrabacionChat = null;
+    }
+    if (detectorSilencioChat) {
+        clearInterval(detectorSilencioChat);
+        detectorSilencioChat = null;
+    }
 }
 
-function removerIndicadorEscribiendo(id) {
-    const el = document.getElementById(id);
-    if (el) el.remove();
+function procesarAudioChat(audioBlob) {
+    const ejemplos = [
+        'Mi producto llegó dañado',
+        'No me llegó mi pedido',
+        'Quiero devolver un producto',
+        'Problema con el pago',
+        'Dónde está mi envío',
+        'Producto llegó roto'
+    ];
+    const textoAleatorio = ejemplos[Math.floor(Math.random() * ejemplos.length)];
+    
+    Swal.fire({
+        title: '🎤 Audio procesado',
+        text: `"${textoAleatorio}"`,
+        icon: 'success',
+        timer: 1500,
+        showConfirmButton: false,
+        toast: true,
+        position: 'top-end'
+    });
+    
+    setTimeout(() => {
+        const input = document.getElementById('input-mensaje');
+        input.value = textoAleatorio;
+        // Auto-enviar después de 1 segundo
+        setTimeout(() => {
+            const event = new Event('submit', { cancelable: true });
+            document.getElementById('form-chat').dispatchEvent(event);
+        }, 1000);
+    }, 1000);
 }
 
 // ===== FUNCIÓN PARA ADJUNTAR IMÁGENES =====
@@ -381,114 +521,62 @@ function eliminarImagen() {
     document.getElementById('imagen-preview').src = '';
 }
 
-// ===== GRABACIÓN DE AUDIO EN EL CHAT =====
-let mediaRecorderChat = null;
-let audioChunksChat = [];
-let tiempoGrabacionChat = 0;
-let intervaloGrabacionChat = null;
-
-document.addEventListener('DOMContentLoaded', function() {
-    const btnGrabarChat = document.getElementById('btn-grabar-audio-chat');
-    if (btnGrabarChat) {
-        btnGrabarChat.addEventListener('click', function() {
-            if (!mediaRecorderChat || mediaRecorderChat.state === 'inactive') {
-                iniciarGrabacionChat();
-            } else {
-                mediaRecorderChat.stop();
-                mediaRecorderChat.stream.getTracks().forEach(track => track.stop());
-                detenerGrabacionChatUI();
-            }
-        });
+// ===== FUNCIONES DE BURBUJAS =====
+function agregarBurbuja(texto, esUsuario) {
+    const cajaMensajes = document.getElementById('caja-mensajes');
+    const divMensaje = document.createElement('div');
+    
+    if (esUsuario) {
+        divMensaje.className = "flex items-start gap-2.5 max-w-[85%] ml-auto justify-end";
+        divMensaje.innerHTML = `
+            <div class="flex flex-col w-full leading-1.5 p-4 bg-gradient-to-br from-blue-600 to-purple-600 text-white shadow-md rounded-xl bubble-user">
+                <p class="text-sm font-normal">${texto}</p>
+                <span class="text-[10px] text-purple-200 mt-1 text-right">Enviado</span>
+            </div>
+        `;
+    } else {
+        divMensaje.className = "flex items-start gap-2.5 max-w-[85%]";
+        divMensaje.innerHTML = `
+            <div class="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center text-sm shadow flex-shrink-0">
+                <i class="fas fa-robot"></i>
+            </div>
+            <div class="flex flex-col w-full leading-1.5 p-4 bg-white shadow-sm border border-gray-100 rounded-xl bubble-ia">
+                <p class="text-sm font-normal text-gray-800">${texto}</p>
+                <span class="text-[10px] text-gray-400 mt-1 text-right">IA Asistente</span>
+            </div>
+        `;
     }
-});
-
-function iniciarGrabacionChat() {
-    const estadoGrabacion = document.getElementById('estado-grabacion-chat');
-    const btnGrabar = document.getElementById('btn-grabar-audio-chat');
     
-    navigator.mediaDevices.getUserMedia({ audio: true })
-        .then(stream => {
-            mediaRecorderChat = new MediaRecorder(stream);
-            audioChunksChat = [];
-            tiempoGrabacionChat = 0;
-            
-            mediaRecorderChat.ondataavailable = event => {
-                audioChunksChat.push(event.data);
-            };
-            
-            mediaRecorderChat.onstop = () => {
-                const audioBlob = new Blob(audioChunksChat, { type: 'audio/wav' });
-                procesarAudioChat(audioBlob);
-                detenerGrabacionChatUI();
-            };
-            
-            mediaRecorderChat.start();
-            
-            btnGrabar.innerHTML = '<i class="fas fa-stop"></i>';
-            btnGrabar.classList.add('recording');
-            estadoGrabacion.classList.remove('hidden');
-            
-            intervaloGrabacionChat = setInterval(() => {
-                tiempoGrabacionChat++;
-                const minutos = String(Math.floor(tiempoGrabacionChat / 60)).padStart(2, '0');
-                const segundos = String(tiempoGrabacionChat % 60).padStart(2, '0');
-                document.getElementById('tiempo-grabacion-chat').textContent = `${minutos}:${segundos}`;
-            }, 1000);
-        })
-        .catch(error => {
-            Swal.fire({
-                title: '❌ Error de micrófono',
-                text: 'No se pudo acceder al micrófono. Verifica los permisos del navegador.',
-                icon: 'error',
-                confirmButtonColor: '#7c3aed'
-            });
-            console.error('Error al acceder al micrófono:', error);
-        });
+    cajaMensajes.appendChild(divMensaje);
+    cajaMensajes.scrollTop = cajaMensajes.scrollHeight;
 }
 
-function detenerGrabacionChatUI() {
-    const btnGrabar = document.getElementById('btn-grabar-audio-chat');
-    const estadoGrabacion = document.getElementById('estado-grabacion-chat');
-    
-    btnGrabar.innerHTML = '<i class="fas fa-microphone"></i>';
-    btnGrabar.classList.remove('recording');
-    estadoGrabacion.classList.add('hidden');
-    
-    if (intervaloGrabacionChat) {
-        clearInterval(intervaloGrabacionChat);
-        intervaloGrabacionChat = null;
-    }
+function mostrarIndicadorEscribiendo() {
+    const cajaMensajes = document.getElementById('caja-mensajes');
+    const id = "escribiendo-" + Date.now();
+    const divIndicador = document.createElement('div');
+    divIndicador.id = id;
+    divIndicador.className = "flex items-start gap-2.5 max-w-[85%]";
+    divIndicador.innerHTML = `
+        <div class="w-8 h-8 rounded-full bg-purple-200 text-purple-700 flex items-center justify-center text-sm flex-shrink-0">
+            <i class="fas fa-robot"></i>
+        </div>
+        <div class="p-3 bg-gray-100 rounded-xl text-gray-500 text-xs flex items-center gap-1">
+            <span>Escribiendo</span>
+            <span class="animate-ping">.</span><span class="animate-ping delay-150">.</span><span class="animate-ping delay-300">.</span>
+        </div>
+    `;
+    cajaMensajes.appendChild(divIndicador);
+    cajaMensajes.scrollTop = cajaMensajes.scrollHeight;
+    return id;
 }
 
-function procesarAudioChat(audioBlob) {
-    // Simulación de procesamiento de audio a texto
-    const ejemplos = [
-        'No me llegó mi pedido',
-        'Quiero devolver un producto',
-        'Problema con el pago',
-        'Dónde está mi envío',
-        'Cómo puedo cambiar mi dirección'
-    ];
-    const textoAleatorio = ejemplos[Math.floor(Math.random() * ejemplos.length)];
-    
-    Swal.fire({
-        title: '🎤 Procesando audio...',
-        text: `Texto detectado: "${textoAleatorio}"`,
-        icon: 'success',
-        timer: 2000,
-        showConfirmButton: false
-    });
-    
-    setTimeout(() => {
-        const input = document.getElementById('input-mensaje');
-        input.value = textoAleatorio;
-        // Enviar automáticamente
-        const event = new Event('submit', { cancelable: true });
-        document.getElementById('form-chat').dispatchEvent(event);
-    }, 2000);
+function removerIndicadorEscribiendo(id) {
+    const el = document.getElementById(id);
+    if (el) el.remove();
 }
 
-// ===== CARGAR CONSULTA AUTOMÁTICA DESDE EL CENTRO DE SOPORTE =====
+// ===== CARGAR CONSULTA AUTOMÁTICA =====
 document.addEventListener('DOMContentLoaded', () => {
     const consultaGuardada = localStorage.getItem('consulta_ia');
     if (consultaGuardada) {
@@ -503,7 +591,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// ===== EXPORTAR FUNCIONES PARA USO GLOBAL =====
+// ===== EXPORTAR FUNCIONES =====
 window.enviarMensajeUsuario = enviarMensajeUsuario;
 window.agregarBurbuja = agregarBurbuja;
 window.mostrarIndicadorEscribiendo = mostrarIndicadorEscribiendo;

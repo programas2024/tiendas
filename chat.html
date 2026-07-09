@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="tienda/css/estilos.css">
     <style>
         .chat-container { height: calc(100vh - 140px); }
         .burbuja-ia { border-bottom-left-radius: 4px; }
@@ -90,6 +91,24 @@
             max-width: 200px;
             border-radius: 12px;
             margin-top: 5px;
+        }  
+            
+        /* Modal Info */
+        #modal-info {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+        #modal-info.flex {
+            display: flex;
+        }
+        .modal-content {
+            max-height: 90vh;
+            overflow-y: auto;
         }
     </style>
 </head>
@@ -114,11 +133,37 @@
                     </p>
                 </div>
             </div>
-            <a href="index.html" class="bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg text-xs font-medium transition">
-                Salir al Inicio
-            </a>
+            
+            <!-- Botones del header -->
+            <div class="flex items-center gap-2">
+                <!-- NUEVO BOTÓN DE INFORMACIÓN -->
+                <button id="btn-info" class="bg-white/10 hover:bg-white/20 p-2 rounded-lg transition text-sm flex items-center gap-1">
+                    <i class="fas fa-info-circle"></i>
+                    <span class="hidden sm:inline">Info</span>
+                </button>
+                <a href="index.html" class="bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg text-xs font-medium transition">
+                    Salir al Inicio
+                </a>
+            </div>
         </div>
     </header>
+
+    <!-- MODAL DE INFORMACIÓN -->
+    <div id="modal-info">
+        <div class="bg-white rounded-2xl p-6 max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto modal-content">
+            <div class="flex justify-between items-center mb-4 sticky top-0 bg-white z-10 pb-2">
+                <h2 class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                    <i class="fas fa-store-alt mr-2"></i>ShopVerse
+                </h2>
+                <button onclick="cerrarInfo()" class="text-gray-500 hover:text-gray-700 text-2xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="info-contenido">
+                <!-- Generado por infobot.js -->
+            </div>
+        </div>
+    </div>
 
     <main class="container mx-auto max-w-2xl px-4 py-4">
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 flex flex-col chat-container">
@@ -171,6 +216,41 @@
         </div>   
     </main>
 
+    <footer class="bg-gradient-to-r from-blue-600 via-blue-500 to-purple-600 text-white mt-12">
+        <div class="container mx-auto px-4 py-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
+                <div>
+                    <h3 class="font-bold text-xl mb-2 flex items-center justify-center md:justify-start gap-2">
+                        <i class="fas fa-store-alt"></i> ShopVerse
+                    </h3>
+                    <p class="text-blue-100">Tu tienda virtual favorita</p>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-2">Enlaces</h4>
+                    <ul class="space-y-1 text-blue-100">
+                        <li><a href="#" class="hover:text-white transition">Términos y condiciones</a></li>
+                        <li><a href="#" class="hover:text-white transition">Política de privacidad</a></li>
+                        <li><a href="#" class="hover:text-white transition">Centro de ayuda</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-2">Síguenos</h4>
+                    <div class="flex justify-center md:justify-start space-x-4">
+                        <a href="#" class="text-2xl hover:text-purple-200 transition transform hover:scale-110"><i class="fab fa-facebook"></i></a>
+                        <a href="#" class="text-2xl hover:text-purple-200 transition transform hover:scale-110"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-2xl hover:text-purple-200 transition transform hover:scale-110"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-2xl hover:text-purple-200 transition transform hover:scale-110"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-blue-400 mt-6 pt-6 text-center text-blue-100">
+                <p>&copy; 2026 ShopVerse. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="tienda/js/infobot.js"></script>
     <script src="tienda/js/chat.js"></script>
 </body>
 </html>

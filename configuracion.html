@@ -54,6 +54,9 @@
         .config-card .icon-wrapper.cyan { background: #cffafe; color: #06b6d4; }
         .config-card .icon-wrapper.teal { background: #ccfbf1; color: #14b8a6; }
         .config-card .icon-wrapper.rose { background: #ffe4e6; color: #f43f5e; }
+        .config-card .icon-wrapper.amber { background: #fef3c7; color: #d97706; }
+        .config-card .icon-wrapper.sky { background: #e0f2fe; color: #0ea5e9; }
+        .config-card .icon-wrapper.fuchsia { background: #fdf4ff; color: #d946ef; }
         
         .config-card .arrow {
             color: #9ca3af;
@@ -295,7 +298,7 @@
                 </h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <!-- Nombre -->
-                    <div class="config-card bg-white rounded-xl p-4 flex items-center justify-between" onclick="editarConfig('nombre')">
+                    <div class="config-card bg-white rounded-xl p-4 flex items-center justify-between" onclick="editarNombre()">
                         <div class="flex items-center gap-3">
                             <div class="icon-wrapper blue"><i class="fas fa-user"></i></div>
                             <div>
@@ -306,7 +309,7 @@
                         <i class="fas fa-chevron-right arrow"></i>
                     </div>
                     <!-- Correo -->
-                    <div class="config-card bg-white rounded-xl p-4 flex items-center justify-between" onclick="editarConfig('correo')">
+                    <div class="config-card bg-white rounded-xl p-4 flex items-center justify-between" onclick="editarCorreo()">
                         <div class="flex items-center gap-3">
                             <div class="icon-wrapper purple"><i class="fas fa-envelope"></i></div>
                             <div>
@@ -327,7 +330,7 @@
                 </h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <!-- Logros -->
-                    <div class="config-card bg-white rounded-xl p-4 flex items-center justify-between" onclick="editarConfig('logros')">
+                    <div class="config-card bg-white rounded-xl p-4 flex items-center justify-between" onclick="verLogros()">
                         <div class="flex items-center gap-3">
                             <div class="icon-wrapper orange"><i class="fas fa-trophy"></i></div>
                             <div>
@@ -338,7 +341,7 @@
                         <i class="fas fa-chevron-right arrow"></i>
                     </div>
                     <!-- Saldo -->
-                    <div class="config-card bg-white rounded-xl p-4 flex items-center justify-between" onclick="editarConfig('saldo')">
+                    <div class="config-card bg-white rounded-xl p-4 flex items-center justify-between" onclick="verSaldo()">
                         <div class="flex items-center gap-3">
                             <div class="icon-wrapper green"><i class="fas fa-coins"></i></div>
                             <div>
@@ -358,7 +361,7 @@
                     Redes Sociales
                 </h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="config-card bg-white rounded-xl p-4 flex items-center justify-between" onclick="editarConfig('redes')">
+                    <div class="config-card bg-white rounded-xl p-4 flex items-center justify-between" onclick="conectarRedSocial('facebook')">
                         <div class="flex items-center gap-3">
                             <div class="icon-wrapper blue"><i class="fab fa-facebook"></i></div>
                             <div>
@@ -368,11 +371,31 @@
                         </div>
                         <i class="fas fa-chevron-right arrow"></i>
                     </div>
-                    <div class="config-card bg-white rounded-xl p-4 flex items-center justify-between" onclick="editarConfig('redes')">
+                    <div class="config-card bg-white rounded-xl p-4 flex items-center justify-between" onclick="conectarRedSocial('instagram')">
                         <div class="flex items-center gap-3">
                             <div class="icon-wrapper pink"><i class="fab fa-instagram"></i></div>
                             <div>
                                 <p class="font-semibold text-gray-800 text-sm">Instagram</p>
+                                <p class="text-sm text-gray-500">Conectar cuenta</p>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-right arrow"></i>
+                    </div>
+                    <div class="config-card bg-white rounded-xl p-4 flex items-center justify-between" onclick="conectarRedSocial('twitter')">
+                        <div class="flex items-center gap-3">
+                            <div class="icon-wrapper sky"><i class="fab fa-twitter"></i></div>
+                            <div>
+                                <p class="font-semibold text-gray-800 text-sm">Twitter</p>
+                                <p class="text-sm text-gray-500">Conectar cuenta</p>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-right arrow"></i>
+                    </div>
+                    <div class="config-card bg-white rounded-xl p-4 flex items-center justify-between" onclick="conectarRedSocial('youtube')">
+                        <div class="flex items-center gap-3">
+                            <div class="icon-wrapper red"><i class="fab fa-youtube"></i></div>
+                            <div>
+                                <p class="font-semibold text-gray-800 text-sm">YouTube</p>
                                 <p class="text-sm text-gray-500">Conectar cuenta</p>
                             </div>
                         </div>
@@ -388,25 +411,15 @@
                     Privacidad
                 </h2>
                 <div class="grid grid-cols-1 gap-4">
-                    <div class="config-card bg-white rounded-xl p-4 flex items-center justify-between" onclick="editarConfig('privacidad')">
+                    <div class="config-card bg-white rounded-xl p-4 flex items-center justify-between" onclick="mostrarPrivacidad()">
                         <div class="flex items-center gap-3">
                             <div class="icon-wrapper red"><i class="fas fa-user-secret"></i></div>
                             <div>
-                                <p class="font-semibold text-gray-800 text-sm">Privacidad</p>
+                                <p class="font-semibold text-gray-800 text-sm">Configuración de privacidad</p>
                                 <p class="text-sm text-gray-500">Control de datos personales</p>
                             </div>
                         </div>
                         <i class="fas fa-chevron-right arrow"></i>
-                    </div>
-                    <div class="config-card bg-white rounded-xl p-4 flex items-center justify-between">
-                        <div class="flex items-center gap-3">
-                            <div class="icon-wrapper purple"><i class="fas fa-eye"></i></div>
-                            <div>
-                                <p class="font-semibold text-gray-800 text-sm">Perfil público</p>
-                                <p class="text-sm text-gray-500">Mostrar información en el perfil</p>
-                            </div>
-                        </div>
-                        <div class="toggle-switch active" onclick="toggleSwitch(this)"></div>
                     </div>
                 </div>
             </div>
@@ -418,25 +431,15 @@
                     Accesibilidad
                 </h2>
                 <div class="grid grid-cols-1 gap-4">
-                    <div class="config-card bg-white rounded-xl p-4 flex items-center justify-between" onclick="editarConfig('accesibilidad')">
+                    <div class="config-card bg-white rounded-xl p-4 flex items-center justify-between" onclick="mostrarAccesibilidad()">
                         <div class="flex items-center gap-3">
                             <div class="icon-wrapper indigo"><i class="fas fa-font"></i></div>
                             <div>
-                                <p class="font-semibold text-gray-800 text-sm">Tamaño de fuente</p>
-                                <p class="text-sm text-gray-500">Mediano</p>
+                                <p class="font-semibold text-gray-800 text-sm">Configuración de accesibilidad</p>
+                                <p class="text-sm text-gray-500">Ajustes para mejorar tu experiencia</p>
                             </div>
                         </div>
                         <i class="fas fa-chevron-right arrow"></i>
-                    </div>
-                    <div class="config-card bg-white rounded-xl p-4 flex items-center justify-between">
-                        <div class="flex items-center gap-3">
-                            <div class="icon-wrapper cyan"><i class="fas fa-moon"></i></div>
-                            <div>
-                                <p class="font-semibold text-gray-800 text-sm">Modo oscuro</p>
-                                <p class="text-sm text-gray-500">Cambiar tema de la aplicación</p>
-                            </div>
-                        </div>
-                        <div class="toggle-switch" onclick="toggleSwitch(this)"></div>
                     </div>
                 </div>
             </div>
@@ -449,7 +452,7 @@
                 </h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <!-- Invitar -->
-                    <div class="config-card bg-white rounded-xl p-4 flex items-center justify-between" onclick="editarConfig('invitar')">
+                    <div class="config-card bg-white rounded-xl p-4 flex items-center justify-between" onclick="mostrarInvitar()">
                         <div class="flex items-center gap-3">
                             <div class="icon-wrapper orange"><i class="fas fa-user-plus"></i></div>
                             <div>
@@ -460,9 +463,9 @@
                         <i class="fas fa-chevron-right arrow"></i>
                     </div>
                     <!-- Descuentos VIP -->
-                    <div class="config-card bg-white rounded-xl p-4 flex items-center justify-between" onclick="editarConfig('vip')">
+                    <div class="config-card bg-white rounded-xl p-4 flex items-center justify-between" onclick="mostrarVIP()">
                         <div class="flex items-center gap-3">
-                            <div class="icon-wrapper teal"><i class="fas fa-crown"></i></div>
+                            <div class="icon-wrapper amber"><i class="fas fa-crown"></i></div>
                             <div>
                                 <p class="font-semibold text-gray-800 text-sm">Descuentos VIP</p>
                                 <p class="text-sm text-gray-500"><span class="badge-vip">VIP</span> 15% de descuento</p>
@@ -480,7 +483,7 @@
                     Legal
                 </h2>
                 <div class="grid grid-cols-1 gap-4">
-                    <div class="config-card bg-white rounded-xl p-4 flex items-center justify-between" onclick="editarConfig('terminos')">
+                    <div class="config-card bg-white rounded-xl p-4 flex items-center justify-between" onclick="mostrarTerminos()">
                         <div class="flex items-center gap-3">
                             <div class="icon-wrapper rose"><i class="fas fa-file-contract"></i></div>
                             <div>
@@ -490,9 +493,9 @@
                         </div>
                         <i class="fas fa-chevron-right arrow"></i>
                     </div>
-                    <div class="config-card bg-white rounded-xl p-4 flex items-center justify-between" onclick="editarConfig('terminos')">
+                    <div class="config-card bg-white rounded-xl p-4 flex items-center justify-between" onclick="mostrarPrivacidadLegal()">
                         <div class="flex items-center gap-3">
-                            <div class="icon-wrapper purple"><i class="fas fa-shield-alt"></i></div>
+                            <div class="icon-wrapper fuchsia"><i class="fas fa-shield-alt"></i></div>
                             <div>
                                 <p class="font-semibold text-gray-800 text-sm">Política de privacidad</p>
                                 <p class="text-sm text-gray-500">Protección de datos personales</p>
@@ -554,10 +557,17 @@
     <!-- ==================== SCRIPTS ==================== -->
     <script src="tienda/js/productos.js"></script>
     <script src="tienda/js/carrito.js"></script>
-    <script src="tienda/js/perfil.js"></script>
-    <script src="tienda/js/configuracion.js"></script>
     <script src="tienda/js/app.js"></script>
     
-   
+    <!-- Configuración - Separado por secciones -->
+    <script src="tienda/js/config-perfil.js"></script>
+    <script src="tienda/js/config-cuenta.js"></script>
+    <script src="tienda/js/config-redes.js"></script>
+    <script src="tienda/js/config-privacidad.js"></script>
+    <script src="tienda/js/config-accesibilidad.js"></script>
+    <script src="tienda/js/config-beneficios.js"></script>
+    <script src="tienda/js/config-legal.js"></script>
+    <script src="tienda/js/config-main.js"></script>
+    
 </body>
 </html>
