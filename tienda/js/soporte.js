@@ -63,11 +63,18 @@ const preguntasEstablecidas = [
 // ===== FUNCIÓN DE BÚSQUEDA INTELIGENTE MEJORADA =====
 function buscarPreguntaInteligente(consulta) {
     const consultaLower = consulta.toLowerCase().trim();
-    const palabras = consultaLower.split(' ');
+    const palabras = consultaLower.split(/\s+/);
     let mejoresResultados = [];
     
     // Filtrar palabras vacías y cortas
     const palabrasFiltradas = palabras.filter(p => p.length > 2);
+    
+    // Detectar intención del usuario para mejorar el contexto
+    const esSobreDemora = /\b(demora|tard[eao]|retras[ao]|aún no|aun no|todavía no|todavia no|no ha llegado|no me ha llegado|pasaron \d+|han pasado)\b/i.test(consultaLower);
+    const esSobreDano = /\b(dañado|roto|quebrado|maltratado|golpeado|defectuoso|falla|estropeado)\b/i.test(consultaLower);
+    const esSobrePago = /\b(pago|pagar|tarjeta|crédito|debito|webpay|transferencia|cobr[ao]|factura|boleta)\b/i.test(consultaLower);
+    const esSobreDevolucion = /\b(devolver|devoluci[oó]n|cambiar|cambio|reembolso|garant[ií]a|regresar|retorn[ao])\b/i.test(consultaLower);
+    const esSobreEnvio = /\b(env[ií]o|envia|envi[ao]|lleg[oó]|llega|paquete|despacho|seguimiento|rastre[ao]|tracking|direcci[oó]n|domicilio|mensajer[ií]a|correo)\b/i.test(consultaLower);
     
     preguntasEstablecidas.forEach(item => {
         let puntaje = 0;
@@ -87,30 +94,51 @@ function buscarPreguntaInteligente(consulta) {
             if (item.pregunta.toLowerCase().includes(palabra)) {
                 puntaje += 1;
             }
-            // Buscar en palabras clave
-            if (item.palabrasClave.some(pc => pc.includes(palabra) || palabra.includes(pc))) {
+            // Buscar en palabras clave con coincidencia parcial
+            if (item.palabrasClave.some(pc => {
+                return pc.includes(palabra) || palabra.includes(pc) ||
+                       (palabra.length > 4 && pc.length > 4 && (
+                           pc.substring(0, pc.length-1) === palabra.substring(0, palabra.length-1) ||
+                           palabra.substring(0, palabra.length-1) === pc.substring(0, pc.length-1)
+                       ));
+            })) {
                 puntaje += 2;
             }
         });
         
-        // 3. Penalizar si la consulta es sobre un contexto diferente
-        // Por ejemplo: si pregunta por "producto dañado" y la pregunta es sobre "pagos"
-        if (consultaLower.includes('dañado') || consultaLower.includes('roto') || consultaLower.includes('problema')) {
-            if (item.contexto !== 'devolucion') {
-                puntaje -= 5; // Penalización fuerte
-            }
+        // 3. Bonificación por contexto detectado
+        if (esSobreDemora && item.contexto === 'envio') {
+            puntaje += 6; // Fuerte bonificación para consultas de demora → envío
+        }
+        if (esSobreDano && item.contexto === 'devolucion') {
+            puntaje += 5;
+        }
+        if (esSobrePago && item.contexto === 'pago') {
+            puntaje += 5;
+        }
+        if (esSobreDevolucion && item.contexto === 'devolucion') {
+            puntaje += 5;
+        }
+        if (esSobreEnvio && item.contexto === 'envio') {
+            puntaje += 4;
         }
         
-        if (consultaLower.includes('pago') || consultaLower.includes('tarjeta') || consultaLower.includes('webpay')) {
-            if (item.contexto !== 'pago') {
-                puntaje -= 3;
-            }
+        // 4. Penalización por contexto INCORRECTO
+        // Si habla de daño/roto pero NO es devolución → penalizar fuerte
+        if (esSobreDano && item.contexto !== 'devolucion') {
+            puntaje -= 6;
         }
-        
-        if (consultaLower.includes('envío') || consultaLower.includes('envio') || consultaLower.includes('llegó')) {
-            if (item.contexto === 'pago') {
-                puntaje -= 4;
-            }
+        // Si habla de demora/envío pero es pregunta de pago → penalizar
+        if ((esSobreDemora || esSobreEnvio) && item.contexto === 'pago') {
+            puntaje -= 5;
+        }
+        // Si habla de devolución pero es pregunta de envío → penalizar
+        if (esSobreDevolucion && item.contexto === 'envio' && !esSobreEnvio) {
+            puntaje -= 4;
+        }
+        // Si habla de pago pero es pregunta de envío → penalizar
+        if (esSobrePago && item.contexto === 'envio') {
+            puntaje -= 4;
         }
         
         if (puntaje > 0) {
@@ -218,17 +246,20 @@ function buscarOIrAIChat() {
     }
 }
 
-// ===== GRABACIÓN DE AUDIO CON AUTO-ENVÍO =====
+// ===== GRABACIÓN DE AUDIO CON AUTO-ENVÍO Y RECONOCIMIENTO DE VOZ REAL =====
 let mediaRecorder = null;
 let audioChunks = [];
 let tiempoGrabacion = 0;
 let intervaloGrabacion = null;
 let tiempoSilencio = 0;
 let detectorSilencio = null;
+let recognitionSoporte = null;
+let transcripcionFinalSoporte = '';
 
 function iniciarGrabacion() {
     const estadoGrabacion = document.getElementById('estado-grabacion');
     const btnGrabar = document.getElementById('btn-grabar-audio');
+    transcripcionFinalSoporte = '';
     
     navigator.mediaDevices.getUserMedia({ audio: true })
         .then(stream => {
@@ -247,17 +278,59 @@ function iniciarGrabacion() {
             
             const dataArray = new Uint8Array(analyser.fftSize);
             
+            // ===== RECONOCIMIENTO DE VOZ REAL =====
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (SpeechRecognition) {
+                recognitionSoporte = new SpeechRecognition();
+                recognitionSoporte.lang = 'es-ES';
+                recognitionSoporte.interimResults = true;
+                recognitionSoporte.continuous = true;
+                
+                recognitionSoporte.onresult = (event) => {
+                    let interim = '';
+                    let final = '';
+                    for (let i = event.resultIndex; i < event.results.length; i++) {
+                        const result = event.results[i];
+                        if (result.isFinal) {
+                            final += result[0].transcript;
+                        } else {
+                            interim += result[0].transcript;
+                        }
+                    }
+                    if (final) transcripcionFinalSoporte = final.trim();
+                    // Mostrar texto en tiempo real en el input
+                    const input = document.getElementById('buscador-problema');
+                    if (input && (interim || final)) {
+                        input.value = (transcripcionFinalSoporte + ' ' + interim).trim();
+                        input.style.color = interim ? '#6b7280' : '#1f2937';
+                        // Disparar filtrado en vivo
+                        filtrarFAQs();
+                    }
+                };
+                
+                recognitionSoporte.onerror = (event) => {
+                    console.warn('Error de reconocimiento:', event.error);
+                };
+                
+                recognitionSoporte.start();
+            }
+            
             mediaRecorder.ondataavailable = event => {
                 audioChunks.push(event.data);
             };
             
             mediaRecorder.onstop = () => {
-                const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-                procesarAudio(audioBlob);
                 detenerGrabacionUI();
                 if (audioContext.state !== 'closed') {
                     audioContext.close();
                 }
+                // Detener reconocimiento de voz
+                if (recognitionSoporte) {
+                    recognitionSoporte.stop();
+                    recognitionSoporte = null;
+                }
+                // Procesar el texto reconocido
+                procesarAudioTranscripcion();
             };
             
             mediaRecorder.start();
@@ -274,7 +347,7 @@ function iniciarGrabacion() {
                 document.getElementById('tiempo-grabacion').textContent = `${minutos}:${segundos}`;
             }, 1000);
             
-            // Detector de silencio
+            // Detector de silencio - 2 SEGUNDOS
             detectorSilencio = setInterval(() => {
                 analyser.getByteTimeDomainData(dataArray);
                 let sum = 0;
@@ -285,24 +358,17 @@ function iniciarGrabacion() {
                 const rms = Math.sqrt(sum / dataArray.length);
                 const db = 20 * Math.log10(rms);
                 
-                // Si el volumen es muy bajo (silencio)
                 if (db < -40) {
                     tiempoSilencio++;
-                    // Después de 1 segundo de silencio (10 iteraciones de 100ms)
-                    if (tiempoSilencio >= 10) {
-                        // Detener grabación automáticamente
+                    // Después de 2 segundos de silencio (20 iteraciones de 100ms)
+                    if (tiempoSilencio >= 20) {
                         if (mediaRecorder && mediaRecorder.state === 'recording') {
                             mediaRecorder.stop();
                             mediaRecorder.stream.getTracks().forEach(track => track.stop());
-                            detenerGrabacionUI();
-                            if (audioContext.state !== 'closed') {
-                                audioContext.close();
-                            }
                             clearInterval(detectorSilencio);
                         }
                     }
                 } else {
-                    // Reiniciar contador de silencio si hay sonido
                     tiempoSilencio = 0;
                 }
             }, 100);
@@ -334,24 +400,33 @@ function detenerGrabacionUI() {
         clearInterval(detectorSilencio);
         detectorSilencio = null;
     }
+    if (recognitionSoporte) {
+        recognitionSoporte.stop();
+        recognitionSoporte = null;
+    }
 }
 
-function procesarAudio(audioBlob) {
-    // Simulación de procesamiento de audio a texto
-    // En producción usarías: Google Speech-to-Text, Whisper API, etc.
-    const ejemplos = [
-        'Mi producto llegó dañado',
-        'No me llegó mi paquete',
-        'Cómo puedo devolver un producto',
-        'Problema con el pago',
-        'Dónde está mi envío',
-        'Producto llegó roto'
-    ];
-    const textoAleatorio = ejemplos[Math.floor(Math.random() * ejemplos.length)];
+function procesarAudioTranscripcion() {
+    const input = document.getElementById('buscador-problema');
+    const texto = transcripcionFinalSoporte.trim();
+    
+    if (!texto) {
+        // Si no se reconoció nada, mostrar mensaje
+        Swal.fire({
+            title: '🎤 No se detectó voz',
+            text: 'No se pudo reconocer lo que dijiste. Intenta de nuevo hablando más claro.',
+            icon: 'warning',
+            timer: 2000,
+            showConfirmButton: false,
+            toast: true,
+            position: 'top-end'
+        });
+        return;
+    }
     
     Swal.fire({
         title: '🎤 Audio procesado',
-        text: `"${textoAleatorio}"`,
+        text: `"${texto}"`,
         icon: 'success',
         timer: 1500,
         showConfirmButton: false,
@@ -360,13 +435,13 @@ function procesarAudio(audioBlob) {
     });
     
     setTimeout(() => {
-        const input = document.getElementById('buscador-problema');
-        input.value = textoAleatorio;
-        // Auto-enviar después de 1 segundo
+        input.value = texto;
+        input.style.color = '#1f2937';
+        // Buscar o enviar a IA
         setTimeout(() => {
             buscarOIrAIChat();
-        }, 1000);
-    }, 1000);
+        }, 800);
+    }, 800);
 }
 
 // ===== EVENTOS =====
@@ -425,6 +500,136 @@ document.addEventListener('DOMContentLoaded', function() {
         primerFaq.classList.add('active');
     }
 });
+
+// ===== FUNCIONES DE FAQ =====
+function toggleFAQ(elemento) {
+    elemento.classList.toggle('active');
+    const icono = elemento.querySelector('.faq-icon');
+    if (icono) {
+        if (elemento.classList.contains('active')) {
+            icono.style.transform = 'rotate(180deg)';
+        } else {
+            icono.style.transform = 'rotate(0deg)';
+        }
+    }
+}
+
+// ===== FILTRAR FAQs EN TIEMPO REAL =====
+function filtrarFAQs() {
+    const input = document.getElementById('buscador-problema');
+    if (!input) return;
+    const query = input.value.trim().toLowerCase();
+    const faqItems = document.querySelectorAll('.faq-item');
+    
+    if (query.length < 2) {
+        // Mostrar todas si no hay búsqueda
+        faqItems.forEach(item => {
+            item.style.display = '';
+            item.classList.remove('active');
+        });
+        // Resaltar la primera
+        if (faqItems.length > 0) {
+            faqItems[0].classList.add('active');
+        }
+        return;
+    }
+    
+    let mejorPuntaje = -1;
+    let mejorFaq = null;
+    
+    faqItems.forEach(item => {
+        const pregunta = item.querySelector('.faq-pregunta span');
+        const respuesta = item.querySelector('.faq-respuesta');
+        if (!pregunta) return;
+        
+        const textoPregunta = pregunta.textContent.toLowerCase();
+        const textoRespuesta = respuesta ? respuesta.textContent.toLowerCase() : '';
+        const textoCompleto = textoPregunta + ' ' + textoRespuesta;
+        
+        // Calcular puntaje de coincidencia
+        let puntaje = 0;
+        const palabras = query.split(/\s+/);
+        
+        palabras.forEach(palabra => {
+            if (palabra.length < 2) return;
+            if (textoPregunta.includes(palabra)) puntaje += 3;
+            if (textoRespuesta.includes(palabra)) puntaje += 1;
+        });
+        
+        // Coincidencia exacta de frase
+        if (textoCompleto.includes(query)) puntaje += 5;
+        
+        if (puntaje > 0) {
+            item.style.display = '';
+            if (puntaje > mejorPuntaje) {
+                mejorPuntaje = puntaje;
+                mejorFaq = item;
+            }
+        } else {
+            item.style.display = 'none';
+        }
+        
+        // Cerrar todas menos la mejor
+        if (item !== mejorFaq) {
+            item.classList.remove('active');
+            const icono = item.querySelector('.faq-icon');
+            if (icono) icono.style.transform = 'rotate(0deg)';
+        }
+    });
+    
+    // Expandir la mejor coincidencia
+    if (mejorFaq && mejorPuntaje > 0) {
+        mejorFaq.classList.add('active');
+        const icono = mejorFaq.querySelector('.faq-icon');
+        if (icono) icono.style.transform = 'rotate(180deg)';
+        // Hacer scroll hacia la FAQ
+        mejorFaq.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+}
+
+// ===== AYUDA RÁPIDA =====
+function ayudaRapida(tipo) {
+    const preguntas = {
+        'estado-envio': preguntasEstablecidas[1],  // ¿Cuánto tarda el envío?
+        'devolucion': preguntasEstablecidas[3],     // ¿Cómo puedo devolver?
+        'pago': preguntasEstablecidas[2]            // ¿Qué métodos de pago?
+    };
+    
+    const resultado = preguntas[tipo];
+    if (resultado) {
+        mostrarResultadoBusqueda(resultado, resultado.pregunta);
+    }
+}
+
+// ===== COPIAR TELÉFONO =====
+function copiarTelefono() {
+    const telefono = '+56 9 1234 5678';
+    navigator.clipboard.writeText(telefono).then(() => {
+        Swal.fire({
+            icon: 'success',
+            title: '¡Copiado!',
+            text: 'El teléfono ha sido copiado al portapapeles',
+            timer: 1500,
+            showConfirmButton: false,
+            toast: true,
+            position: 'top-end'
+        });
+    }).catch(() => {
+        Swal.fire({
+            title: 'Copia el teléfono',
+            text: telefono,
+            icon: 'info',
+            confirmButtonColor: '#7c3aed',
+            confirmButtonText: 'Copiar',
+            showCancelButton: true,
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                prompt('Copia el teléfono:', telefono);
+            }
+        });
+    });
+}
 
 // ===== EXPORTAR FUNCIONES =====
 window.toggleFAQ = toggleFAQ;

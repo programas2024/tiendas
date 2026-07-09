@@ -78,9 +78,16 @@ function procesarIntencionIA(entrada) {
         return `¡Fue un placer ayudarte! 🙌 Si necesitas algo más, aquí estaré. ¡Que tengas un excelente día! 🌟`;
     }
     
-    // Producto dañado o defectuoso
-    if (frase.includes('dañado') || frase.includes('roto') || frase.includes('defectuoso') || 
-        frase.includes('maltratado') || frase.includes('golpeado') || frase.includes('quebrado')) {
+    // ===== DETECCIÓN POR PRIORIDAD =====
+    // 1. PRIMERO: Pedidos, envíos y demoras (lo más común y debe tener prioridad)
+    const esDemora = /\b(demora|tard[eao]|retras[ao]|aún no|aun no|todavía no|todavia no|no ha llegado|no me ha llegado|pasaron \d+|han pasado \d+|d[ií]as)\b/i.test(frase);
+    const esEnvio = /\b(env[ií]o|envia|envi[ao]|lleg[oó]|llega|paquete|despacho|seguimiento|rastre[ao]|tracking|direcci[oó]n|domicilio|mensajer[ií]a|no llega|no lleg[oó])\b/i.test(frase);
+    const esDano = /\b(dañado|roto|quebrado|maltratado|golpeado|defectuoso|falla|estropeado|defecto)\b/i.test(frase);
+    const esDevolucion = /\b(devolver|devoluci[oó]n|cambiar|cambio|reembolso|garant[ií]a|regresar|retorn[ao]|devolver|devolucion)\b/i.test(frase);
+    const esPago = /\b(pago|pagar|tarjeta|cr[eé]dito|debito|webpay|transferencia|cobr[ao]|factura|boleta|m[eé]todo)\b/i.test(frase);
+    
+    // Si habla de daño/roto → producto dañado (devolución por daño)
+    if (esDano) {
         return `😔 Lamento mucho que tu producto haya llegado en mal estado. 
 
 📋 Por favor, sigue estos pasos:
@@ -93,18 +100,24 @@ function procesarIntencionIA(entrada) {
 ¿Necesitas que te ayude con algo más? 🤝`;
     }
     
-    // Pedidos y envíos
-    if (frase.includes('pedido') || frase.includes('no llega') || frase.includes('seguimiento') || 
-        frase.includes('rastrear') || frase.includes('envio') || frase.includes('entrega') || frase.includes('paquete')) {
-        if (frase.includes('no llega') || frase.includes('demora') || frase.includes('tarda')) {
-            return `📦 ¡Lamento la demora! Los envíos de ShopVerse tienen un tiempo estimado de 3 a 5 días hábiles. Si pasaron más de 7 días, por favor escríbenos a soporte@shopverse.com con tu número de pedido y te daremos prioridad. 🚀 ¿Tienes tu código de seguimiento?`;
+    // Si habla de envío/demora/paquete (PERO NO de daño) → seguimiento de envío
+    if (esEnvio || esDemora) {
+        if (esDemora) {
+            return `📦 ¡Entiendo tu preocupación! Los envíos de ShopVerse tienen un tiempo estimado de 3 a 5 días hábiles. Si ya pasaron más de 7 días desde tu compra, por favor escríbenos a soporte@shopverse.com con tu número de pedido y te daremos prioridad para investigar con la empresa de mensajería. 🚀
+
+Mientras tanto, puedes verificar el estado en <b>'Mis Compras'</b> desde tu perfil. ¿Tienes tu código de seguimiento a la mano?`;
         }
         return `📦 Para revisar el estado de tu pedido, ve a la sección <b>'Mis Compras'</b> en tu perfil. Allí encontrarás el número de seguimiento y la fecha estimada de entrega. 🚚 Si necesitas más ayuda, ¡estoy aquí! 😊`;
     }
     
-    // Devoluciones
-    if (frase.includes('devolucion') || frase.includes('reembolso') || frase.includes('cambiar') || frase.includes('devolver') || frase.includes('cambio')) {
+    // Si habla explícitamente de devolución/reembolso/cambio (sin daño)
+    if (esDevolucion) {
         return `🔄 ¡Claro que sí! En ShopVerse tienes 30 días para devolver productos desde su recepción. El artículo debe estar en su empaque original y sin uso. 📦 ¿Quieres que te ayude a generar una solicitud de devolución? Solo necesito tu número de pedido. ✨`;
+    }
+    
+    // Si habla de pagos
+    if (esPago) {
+        return `💳 Aceptamos múltiples métodos de pago: Tarjetas de crédito/débito (Visa, Mastercard, American Express), WebPay y transferencias bancarias. Todos los pagos son 100% seguros con encriptación SSL. 🔒 ¿Tienes algún problema con un pago en particular?`;
     }
     
     // Pagos
@@ -289,13 +302,15 @@ async function enviarMensajeUsuario(event) {
     }, 1500);
 }
 
-// ===== GRABACIÓN DE AUDIO EN EL CHAT CON AUTO-ENVÍO =====
+// ===== GRABACIÓN DE AUDIO EN EL CHAT CON RECONOCIMIENTO DE VOZ REAL =====
 let mediaRecorderChat = null;
 let audioChunksChat = [];
 let tiempoGrabacionChat = 0;
 let intervaloGrabacionChat = null;
 let tiempoSilencioChat = 0;
 let detectorSilencioChat = null;
+let recognitionChat = null;
+let transcripcionFinalChat = '';
 
 document.addEventListener('DOMContentLoaded', function() {
     const btnGrabarChat = document.getElementById('btn-grabar-audio-chat');
@@ -319,6 +334,7 @@ document.addEventListener('DOMContentLoaded', function() {
 function iniciarGrabacionChat() {
     const estadoGrabacion = document.getElementById('estado-grabacion-chat');
     const btnGrabar = document.getElementById('btn-grabar-audio-chat');
+    transcripcionFinalChat = '';
     
     navigator.mediaDevices.getUserMedia({ audio: true })
         .then(stream => {
@@ -337,17 +353,55 @@ function iniciarGrabacionChat() {
             
             const dataArray = new Uint8Array(analyser.fftSize);
             
+            // ===== RECONOCIMIENTO DE VOZ REAL =====
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (SpeechRecognition) {
+                recognitionChat = new SpeechRecognition();
+                recognitionChat.lang = 'es-ES';
+                recognitionChat.interimResults = true;
+                recognitionChat.continuous = true;
+                
+                recognitionChat.onresult = (event) => {
+                    let interim = '';
+                    let final = '';
+                    for (let i = event.resultIndex; i < event.results.length; i++) {
+                        const result = event.results[i];
+                        if (result.isFinal) {
+                            final += result[0].transcript;
+                        } else {
+                            interim += result[0].transcript;
+                        }
+                    }
+                    if (final) transcripcionFinalChat = final.trim();
+                    // Mostrar en tiempo real en el input
+                    const input = document.getElementById('input-mensaje');
+                    if (input && (interim || final)) {
+                        input.value = (transcripcionFinalChat + ' ' + interim).trim();
+                        input.style.color = interim ? '#6b7280' : '#1f2937';
+                    }
+                };
+                
+                recognitionChat.onerror = (event) => {
+                    console.warn('Error de reconocimiento chat:', event.error);
+                };
+                
+                recognitionChat.start();
+            }
+            
             mediaRecorderChat.ondataavailable = event => {
                 audioChunksChat.push(event.data);
             };
             
             mediaRecorderChat.onstop = () => {
-                const audioBlob = new Blob(audioChunksChat, { type: 'audio/wav' });
-                procesarAudioChat(audioBlob);
                 detenerGrabacionChatUI();
                 if (audioContext.state !== 'closed') {
                     audioContext.close();
                 }
+                if (recognitionChat) {
+                    recognitionChat.stop();
+                    recognitionChat = null;
+                }
+                procesarAudioChatTranscripcion();
             };
             
             mediaRecorderChat.start();
@@ -364,7 +418,7 @@ function iniciarGrabacionChat() {
                 document.getElementById('tiempo-grabacion-chat').textContent = `${minutos}:${segundos}`;
             }, 1000);
             
-            // Detector de silencio
+            // Detector de silencio - 2 SEGUNDOS
             detectorSilencioChat = setInterval(() => {
                 analyser.getByteTimeDomainData(dataArray);
                 let sum = 0;
@@ -377,14 +431,11 @@ function iniciarGrabacionChat() {
                 
                 if (db < -40) {
                     tiempoSilencioChat++;
-                    if (tiempoSilencioChat >= 10) { // 1 segundo de silencio
+                    // 2 segundos de silencio (20 iteraciones de 100ms)
+                    if (tiempoSilencioChat >= 20) {
                         if (mediaRecorderChat && mediaRecorderChat.state === 'recording') {
                             mediaRecorderChat.stop();
                             mediaRecorderChat.stream.getTracks().forEach(track => track.stop());
-                            detenerGrabacionChatUI();
-                            if (audioContext.state !== 'closed') {
-                                audioContext.close();
-                            }
                             clearInterval(detectorSilencioChat);
                         }
                     }
@@ -420,22 +471,32 @@ function detenerGrabacionChatUI() {
         clearInterval(detectorSilencioChat);
         detectorSilencioChat = null;
     }
+    if (recognitionChat) {
+        recognitionChat.stop();
+        recognitionChat = null;
+    }
 }
 
-function procesarAudioChat(audioBlob) {
-    const ejemplos = [
-        'Mi producto llegó dañado',
-        'No me llegó mi pedido',
-        'Quiero devolver un producto',
-        'Problema con el pago',
-        'Dónde está mi envío',
-        'Producto llegó roto'
-    ];
-    const textoAleatorio = ejemplos[Math.floor(Math.random() * ejemplos.length)];
+function procesarAudioChatTranscripcion() {
+    const input = document.getElementById('input-mensaje');
+    const texto = transcripcionFinalChat.trim();
+    
+    if (!texto) {
+        Swal.fire({
+            title: '🎤 No se detectó voz',
+            text: 'No se pudo reconocer lo que dijiste. Intenta de nuevo hablando más claro.',
+            icon: 'warning',
+            timer: 2000,
+            showConfirmButton: false,
+            toast: true,
+            position: 'top-end'
+        });
+        return;
+    }
     
     Swal.fire({
         title: '🎤 Audio procesado',
-        text: `"${textoAleatorio}"`,
+        text: `"${texto}"`,
         icon: 'success',
         timer: 1500,
         showConfirmButton: false,
@@ -444,14 +505,14 @@ function procesarAudioChat(audioBlob) {
     });
     
     setTimeout(() => {
-        const input = document.getElementById('input-mensaje');
-        input.value = textoAleatorio;
-        // Auto-enviar después de 1 segundo
+        input.value = texto;
+        input.style.color = '#1f2937';
+        // Auto-enviar después de 800ms
         setTimeout(() => {
             const event = new Event('submit', { cancelable: true });
             document.getElementById('form-chat').dispatchEvent(event);
-        }, 1000);
-    }, 1000);
+        }, 800);
+    }, 800);
 }
 
 // ===== FUNCIÓN PARA ADJUNTAR IMÁGENES =====

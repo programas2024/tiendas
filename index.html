@@ -65,6 +65,23 @@
         </nav>
     </header>
 
+    <section id="juego-carousel" class="bg-gradient-to-r from-yellow-400 via-orange-300 to-red-500 text-white px-4 py-5 shadow-lg">
+        <div class="container mx-auto px-2">
+            <div class="flex flex-col xl:flex-row items-stretch gap-4">
+                <div class="flex-1 rounded-[32px] border border-white/20 bg-white/10 p-6 sm:p-8 shadow-xl backdrop-blur-xl flex flex-col justify-between">
+                    <div>
+                        <h2 class="text-2xl sm:text-3xl font-bold">🎲 Juego de Azar</h2>
+                        <p class="mt-3 text-sm sm:text-base text-white/90 max-w-xl">Prueba tu suerte en nuestra promoción de azar y gana cupones o puntos especiales que podrás usar en tu compra si ganas.</p>
+                    </div>
+                    <div class="mt-6 flex flex-col sm:flex-row items-center gap-3 sm:gap-4">
+                        <button id="btn-juego-azar" class="w-full sm:w-auto bg-white text-orange-600 font-semibold px-5 py-3 rounded-full shadow-lg hover:bg-gray-100 transition">Jugar ahora</button>
+                        <span class="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm text-white/90 border border-white/20">Premios: cupones y puntos de tienda</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <div id="modal-info" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center modal-overlay">
         <div class="bg-white rounded-2xl p-6 max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto modal-content">
             <div class="flex justify-between items-center mb-4 sticky top-0 bg-white z-10 pb-2">
@@ -271,6 +288,7 @@
     <script src="tienda/js/reseñas.js"></script>
     <script src="tienda/js/info.js"></script>
     <script src="tienda/js/soporte.js"></script>
+    <script src="tienda/js/juego-azar.js"></script>
     <script src="tienda/js/app.js"></script>
 </body>
 </html>
