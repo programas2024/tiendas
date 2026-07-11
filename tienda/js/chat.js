@@ -264,6 +264,9 @@ function mostrarCalificacion() {
     });
 }
 
+// ===== CONTROL DE CALIFICACIÓN (solo una vez por sesión) =====
+let calificacionMostrada = false;
+
 // ===== FUNCIÓN MEJORADA PARA ENVIAR MENSAJE =====
 async function enviarMensajeUsuario(event) {
     event.preventDefault();
@@ -286,18 +289,18 @@ async function enviarMensajeUsuario(event) {
         const respuestaIA = procesarIntencionIA(textoMensaje);
         agregarBurbuja(respuestaIA, false);
         
-        // 4. Mostrar calificación después de la respuesta (con delay de 2 segundos)
+        // 4. Mostrar calificación solo una vez por sesión y con delay de 6 segundos
         const esInteraccionSimple = textoMensaje.toLowerCase().includes('hola') || 
                                    textoMensaje.toLowerCase().includes('gracias') ||
                                    textoMensaje.toLowerCase().includes('chao') ||
                                    textoMensaje.toLowerCase().includes('adios') ||
                                    textoMensaje.toLowerCase().includes('buenos dias');
         
-        if (!esInteraccionSimple) {
-            // Esperar 2 segundos antes de mostrar la calificación
+        if (!esInteraccionSimple && !calificacionMostrada) {
+            calificacionMostrada = true; // Marcar que ya se mostró
             setTimeout(() => {
                 mostrarCalificacion();
-            }, 2000); // 2 segundos de delay
+            }, 6000); // 6 segundos de delay
         }
     }, 1500);
 }

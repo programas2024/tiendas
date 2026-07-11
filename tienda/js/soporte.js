@@ -246,159 +246,124 @@ function buscarOIrAIChat() {
     }
 }
 
-// ===== GRABACIÓN DE AUDIO CON AUTO-ENVÍO Y RECONOCIMIENTO DE VOZ REAL =====
-let mediaRecorder = null;
-let audioChunks = [];
-let tiempoGrabacion = 0;
-let intervaloGrabacion = null;
-let tiempoSilencio = 0;
-let detectorSilencio = null;
+// ===== GRABACIÓN DE AUDIO - SOLO SPEECH RECOGNITION (sin doble permiso) =====
 let recognitionSoporte = null;
 let transcripcionFinalSoporte = '';
+let silencioTimerSoporte = null;
+let tiempoGrabacionSoporte = 0;
+let intervaloGrabacionSoporte = null;
 
 function iniciarGrabacion() {
     const estadoGrabacion = document.getElementById('estado-grabacion');
     const btnGrabar = document.getElementById('btn-grabar-audio');
     transcripcionFinalSoporte = '';
+    tiempoGrabacionSoporte = 0;
     
-    navigator.mediaDevices.getUserMedia({ audio: true })
-        .then(stream => {
-            mediaRecorder = new MediaRecorder(stream);
-            audioChunks = [];
-            tiempoGrabacion = 0;
-            tiempoSilencio = 0;
-            
-            // Crear analizador de audio para detectar silencio
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const source = audioContext.createMediaStreamSource(stream);
-            const analyser = audioContext.createAnalyser();
-            analyser.fftSize = 512;
-            analyser.smoothingTimeConstant = 0.3;
-            source.connect(analyser);
-            
-            const dataArray = new Uint8Array(analyser.fftSize);
-            
-            // ===== RECONOCIMIENTO DE VOZ REAL =====
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (SpeechRecognition) {
-                recognitionSoporte = new SpeechRecognition();
-                recognitionSoporte.lang = 'es-ES';
-                recognitionSoporte.interimResults = true;
-                recognitionSoporte.continuous = true;
-                
-                recognitionSoporte.onresult = (event) => {
-                    let interim = '';
-                    let final = '';
-                    for (let i = event.resultIndex; i < event.results.length; i++) {
-                        const result = event.results[i];
-                        if (result.isFinal) {
-                            final += result[0].transcript;
-                        } else {
-                            interim += result[0].transcript;
-                        }
-                    }
-                    if (final) transcripcionFinalSoporte = final.trim();
-                    // Mostrar texto en tiempo real en el input
-                    const input = document.getElementById('buscador-problema');
-                    if (input && (interim || final)) {
-                        input.value = (transcripcionFinalSoporte + ' ' + interim).trim();
-                        input.style.color = interim ? '#6b7280' : '#1f2937';
-                        // Disparar filtrado en vivo
-                        filtrarFAQs();
-                    }
-                };
-                
-                recognitionSoporte.onerror = (event) => {
-                    console.warn('Error de reconocimiento:', event.error);
-                };
-                
-                recognitionSoporte.start();
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+        Swal.fire({
+            title: '❌ No soportado',
+            text: 'Tu navegador no soporta reconocimiento de voz. Usa Chrome o Edge.',
+            icon: 'error',
+            confirmButtonColor: '#7c3aed'
+        });
+        return;
+    }
+    
+    recognitionSoporte = new SpeechRecognition();
+    recognitionSoporte.lang = 'es-ES';
+    recognitionSoporte.interimResults = true;
+    recognitionSoporte.continuous = true;
+    
+    recognitionSoporte.onresult = (event) => {
+        // Reiniciar timer de silencio cada vez que llega un resultado
+        if (silencioTimerSoporte) clearTimeout(silencioTimerSoporte);
+        
+        let interim = '';
+        let final = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+            const result = event.results[i];
+            if (result.isFinal) {
+                final += result[0].transcript;
+            } else {
+                interim += result[0].transcript;
             }
-            
-            mediaRecorder.ondataavailable = event => {
-                audioChunks.push(event.data);
-            };
-            
-            mediaRecorder.onstop = () => {
+        }
+        if (final) transcripcionFinalSoporte = final.trim();
+        
+        const input = document.getElementById('buscador-problema');
+        if (input && (interim || final)) {
+            input.value = (transcripcionFinalSoporte + ' ' + interim).trim();
+            input.style.color = interim ? '#6b7280' : '#1f2937';
+            filtrarFAQs();
+        }
+        
+        // Programar silencio: si no llegan más resultados en 2 segundos, detener
+        silencioTimerSoporte = setTimeout(() => {
+            if (recognitionSoporte) {
+                recognitionSoporte.stop();
+                recognitionSoporte = null;
                 detenerGrabacionUI();
-                if (audioContext.state !== 'closed') {
-                    audioContext.close();
-                }
-                // Detener reconocimiento de voz
-                if (recognitionSoporte) {
-                    recognitionSoporte.stop();
-                    recognitionSoporte = null;
-                }
-                // Procesar el texto reconocido
                 procesarAudioTranscripcion();
-            };
-            
-            mediaRecorder.start();
-            
-            btnGrabar.innerHTML = '<i class="fas fa-stop"></i>';
-            btnGrabar.classList.add('recording');
-            estadoGrabacion.classList.remove('hidden');
-            
-            // Contador de tiempo
-            intervaloGrabacion = setInterval(() => {
-                tiempoGrabacion++;
-                const minutos = String(Math.floor(tiempoGrabacion / 60)).padStart(2, '0');
-                const segundos = String(tiempoGrabacion % 60).padStart(2, '0');
-                document.getElementById('tiempo-grabacion').textContent = `${minutos}:${segundos}`;
-            }, 1000);
-            
-            // Detector de silencio - 2 SEGUNDOS
-            detectorSilencio = setInterval(() => {
-                analyser.getByteTimeDomainData(dataArray);
-                let sum = 0;
-                for (let i = 0; i < dataArray.length; i++) {
-                    const value = (dataArray[i] - 128) / 128;
-                    sum += value * value;
-                }
-                const rms = Math.sqrt(sum / dataArray.length);
-                const db = 20 * Math.log10(rms);
-                
-                if (db < -40) {
-                    tiempoSilencio++;
-                    // Después de 2 segundos de silencio (20 iteraciones de 100ms)
-                    if (tiempoSilencio >= 20) {
-                        if (mediaRecorder && mediaRecorder.state === 'recording') {
-                            mediaRecorder.stop();
-                            mediaRecorder.stream.getTracks().forEach(track => track.stop());
-                            clearInterval(detectorSilencio);
-                        }
-                    }
-                } else {
-                    tiempoSilencio = 0;
-                }
-            }, 100);
-        })
-        .catch(error => {
+            }
+        }, 2000);
+    };
+    
+    recognitionSoporte.onerror = (event) => {
+        console.warn('Error de reconocimiento:', event.error);
+        // Solo mostrar error si no es "no-speech" (que es normal)
+        if (event.error === 'not-allowed') {
             Swal.fire({
-                title: '❌ Error de micrófono',
-                text: 'No se pudo acceder al micrófono. Verifica los permisos del navegador.',
+                title: '❌ Permiso denegado',
+                text: 'Debes permitir el acceso al micrófono para grabar audio.',
                 icon: 'error',
                 confirmButtonColor: '#7c3aed'
             });
-            console.error('Error al acceder al micrófono:', error);
-        });
+            detenerGrabacionUI();
+        }
+    };
+    
+    recognitionSoporte.onend = () => {
+        // Si se detuvo automáticamente (no por nosotros), procesar
+        if (recognitionSoporte) {
+            recognitionSoporte = null;
+            detenerGrabacionUI();
+            procesarAudioTranscripcion();
+        }
+    };
+    
+    recognitionSoporte.start();
+    
+    btnGrabar.innerHTML = '<i class="fas fa-stop"></i>';
+    btnGrabar.classList.add('recording');
+    estadoGrabacion.classList.remove('hidden');
+    
+    // Contador de tiempo
+    intervaloGrabacionSoporte = setInterval(() => {
+        tiempoGrabacionSoporte++;
+        const minutos = String(Math.floor(tiempoGrabacionSoporte / 60)).padStart(2, '0');
+        const segundos = String(tiempoGrabacionSoporte % 60).padStart(2, '0');
+        document.getElementById('tiempo-grabacion').textContent = `${minutos}:${segundos}`;
+    }, 1000);
 }
 
 function detenerGrabacionUI() {
     const btnGrabar = document.getElementById('btn-grabar-audio');
     const estadoGrabacion = document.getElementById('estado-grabacion');
     
-    btnGrabar.innerHTML = '<i class="fas fa-microphone"></i>';
-    btnGrabar.classList.remove('recording');
-    estadoGrabacion.classList.add('hidden');
-    
-    if (intervaloGrabacion) {
-        clearInterval(intervaloGrabacion);
-        intervaloGrabacion = null;
+    if (btnGrabar) {
+        btnGrabar.innerHTML = '<i class="fas fa-microphone"></i>';
+        btnGrabar.classList.remove('recording');
     }
-    if (detectorSilencio) {
-        clearInterval(detectorSilencio);
-        detectorSilencio = null;
+    if (estadoGrabacion) estadoGrabacion.classList.add('hidden');
+    
+    if (intervaloGrabacionSoporte) {
+        clearInterval(intervaloGrabacionSoporte);
+        intervaloGrabacionSoporte = null;
+    }
+    if (silencioTimerSoporte) {
+        clearTimeout(silencioTimerSoporte);
+        silencioTimerSoporte = null;
     }
     if (recognitionSoporte) {
         recognitionSoporte.stop();
@@ -411,7 +376,6 @@ function procesarAudioTranscripcion() {
     const texto = transcripcionFinalSoporte.trim();
     
     if (!texto) {
-        // Si no se reconoció nada, mostrar mensaje
         Swal.fire({
             title: '🎤 No se detectó voz',
             text: 'No se pudo reconocer lo que dijiste. Intenta de nuevo hablando más claro.',
@@ -435,9 +399,10 @@ function procesarAudioTranscripcion() {
     });
     
     setTimeout(() => {
-        input.value = texto;
-        input.style.color = '#1f2937';
-        // Buscar o enviar a IA
+        if (input) {
+            input.value = texto;
+            input.style.color = '#1f2937';
+        }
         setTimeout(() => {
             buscarOIrAIChat();
         }, 800);
@@ -459,16 +424,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const btnGrabar = document.getElementById('btn-grabar-audio');
     if (btnGrabar) {
         btnGrabar.addEventListener('click', function() {
-            if (!mediaRecorder || mediaRecorder.state === 'inactive') {
+            if (!recognitionSoporte) {
                 iniciarGrabacion();
             } else {
-                mediaRecorder.stop();
-                mediaRecorder.stream.getTracks().forEach(track => track.stop());
+                // Detener grabación activa
+                recognitionSoporte.stop();
+                recognitionSoporte = null;
                 detenerGrabacionUI();
-                if (detectorSilencio) {
-                    clearInterval(detectorSilencio);
-                    detectorSilencio = null;
-                }
+                procesarAudioTranscripcion();
             }
         });
     }
