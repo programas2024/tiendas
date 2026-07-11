@@ -102,24 +102,93 @@
             margin: 0 8px;
         }
 
-        /* Estilos para el botón de grabación */
         #btn-grabar-audio.recording {
             background-color: #ef4444 !important;
             animation: pulse 1s infinite;
         }
 
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-
-        /* Resultado de búsqueda destacado */
         .resultado-destacado {
             background: linear-gradient(135deg, #faf5ff, #ede9fe);
             border: 2px solid #8b5cf6;
             border-radius: 12px;
             padding: 16px;
             margin: 8px 0;
+        }
+
+        .badge-soporte {
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+            color: white;
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ===== ESTILOS PARA BOTONES DE ICONOS AL EXTREMO DERECHO ===== */
+        .nav-icons-right {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-left: auto;
+        }
+
+        @media (min-width: 640px) {
+            .nav-icons-right {
+                gap: 1rem;
+            }
+        }
+
+        /* ===== INDICADOR DE SOPORTE TÉCNICO ===== */
+        .soporte-tech-badge {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            animation: pulse 2s infinite;
+        }
+
+        /* ===== SCROLL PERSONALIZADO ===== */
+        #contenedor-faqs {
+            scrollbar-width: thin !important;
+            scrollbar-color: #8b5cf6 #f1f1f1 !important;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        #contenedor-faqs::-webkit-scrollbar {
+            width: 6px !important;
+        }
+        #contenedor-faqs::-webkit-scrollbar-track {
+            background: #f1f1f1 !important;
+            border-radius: 10px !important;
+        }
+        #contenedor-faqs::-webkit-scrollbar-thumb {
+            background: #8b5cf6 !important;
+            border-radius: 10px !important;
+        }
+        #contenedor-faqs::-webkit-scrollbar-thumb:hover {
+            background: #7c3aed !important;
+        }
+
+        .modal-content {
+            scrollbar-width: thin !important;
+            scrollbar-color: #8b5cf6 #f1f1f1 !important;
+        }
+        .modal-content::-webkit-scrollbar {
+            width: 6px !important;
+        }
+        .modal-content::-webkit-scrollbar-track {
+            background: #f1f1f1 !important;
+            border-radius: 10px !important;
+        }
+        .modal-content::-webkit-scrollbar-thumb {
+            background: #8b5cf6 !important;
+            border-radius: 10px !important;
         }
     </style>
 </head>
@@ -141,8 +210,8 @@
                         <i class="fas fa-search absolute right-3 top-3 text-gray-500"></i>
                     </div>
                     
-                    <!-- Iconos de navegación (lado derecho) -->
-                    <div class="flex items-center space-x-2 sm:space-x-4 flex-shrink-0">
+                    <!-- ICONOS AL EXTREMO DERECHO -->
+                    <div class="nav-icons-right">
                         <button id="btn-info" class="hover:text-purple-200 transition relative group p-1">
                             <i class="fas fa-info-circle text-lg sm:text-xl"></i>
                             <span class="tooltip-text">Soporte</span>
@@ -173,8 +242,7 @@
         </nav>
     </header>
 
-
-    <!-- ==================== CATEGORÍAS (Modal) ==================== -->
+    <!-- MODALES -->
     <div id="modal-categorias" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center modal-overlay">
         <div class="bg-white rounded-2xl p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto modal-content">
             <div class="flex justify-between items-center mb-4">
@@ -185,13 +253,10 @@
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="lista-categorias">
-                <!-- Generado por JS -->
-            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="lista-categorias"></div>
         </div>
     </div>
 
-    <!-- ==================== CARRITO (Modal) ==================== -->
     <div id="modal-carrito" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center modal-overlay">
         <div class="bg-white rounded-2xl p-6 max-w-2xl w-full mx-4 max-h-[90vh] flex flex-col modal-content">
             <div class="flex justify-between items-center mb-4">
@@ -202,9 +267,7 @@
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <div id="carrito-contenido" class="flex-1 overflow-y-auto">
-                <!-- Generado por JS -->
-            </div>
+            <div id="carrito-contenido" class="flex-1 overflow-y-auto"></div>
             <div class="border-t pt-4 mt-4">
                 <div class="flex justify-between text-xl font-bold mb-4">
                     <span>Total:</span>
@@ -217,7 +280,6 @@
         </div>
     </div>
 
-    <!-- ==================== INFORMACIÓN / SOPORTE (Modal) ==================== -->
     <div id="modal-info" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center modal-overlay">
         <div class="bg-white rounded-2xl p-6 max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto modal-content">
             <div class="flex justify-between items-center mb-4 sticky top-0 bg-white z-10 pb-2">
@@ -228,13 +290,10 @@
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <div id="info-contenido">
-                <!-- Generado por JS -->
-            </div>
+            <div id="info-contenido"></div>
         </div>
     </div>
 
-    <!-- ==================== PERFIL (Modal) ==================== -->
     <div id="modal-perfil" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center modal-overlay">
         <div class="bg-white rounded-2xl p-6 max-w-md w-full mx-4 modal-content">
             <div class="flex justify-between items-center mb-4">
@@ -262,7 +321,7 @@
         </div>
     </div>
 
-    <!-- ==================== CONTENIDO PRINCIPAL - SOPORTE ==================== -->
+    <!-- ==================== CONTENIDO PRINCIPAL ==================== -->
 
     <main class="container mx-auto px-4 py-8">
         
@@ -282,6 +341,7 @@
             <p class="text-gray-500 mt-2 text-lg">¿Necesitas ayuda? Estamos aquí para ti</p>
         </div>
 
+        <!-- MÉTODOS DE CONTACTO -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
             <div class="metodo-contacto bg-blue-50 border border-blue-100">
                 <div class="flex items-center gap-4">
@@ -332,11 +392,12 @@
             </div>
         </div>
 
+        <!-- AYUDA RÁPIDA -->
         <div class="mb-12">
             <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
                 <i class="fas fa-bolt text-purple-600"></i> Ayuda rápida
             </h2>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
                 <div class="soporte-card bg-white rounded-xl p-6 text-center cursor-pointer hover:shadow-md transition" onclick="ayudaRapida('estado-envio')">
                     <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
                         <i class="fas fa-truck-ramp-box text-blue-600 text-2xl"></i>
@@ -360,15 +421,26 @@
                     <h4 class="font-semibold text-gray-800">Métodos de pago</h4>
                     <p class="text-sm text-gray-500">Formas de pago disponibles</p>
                 </div>
+
+                <div class="soporte-card bg-white rounded-xl p-6 text-center cursor-pointer hover:shadow-md transition" onclick="ayudaRapida('cuenta')">
+                    <div class="w-14 h-14 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <i class="fas fa-user-cog text-orange-600 text-2xl"></i>
+                    </div>
+                    <h4 class="font-semibold text-gray-800">Mi Cuenta</h4>
+                    <p class="text-sm text-gray-500">Problemas con tu cuenta</p>
+                </div>
             </div>
         </div>
 
+        <!-- ==================== PREGUNTAS FRECUENTES (MÁS PREGUNTAS) ==================== -->
         <div class="mb-12">
             <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
                 <i class="fas fa-question-circle text-purple-600"></i> Preguntas Frecuentes
+                <span class="badge-soporte ml-2">+15 FAQs</span>
             </h2>
             <div class="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 mb-6">
                 <div id="contenedor-faqs">
+                    <!-- FAQ 1 -->
                     <div class="faq-item" onclick="toggleFAQ(this)">
                         <div class="faq-pregunta px-4 py-3">
                             <span>¿Cómo puedo realizar un pedido?</span>
@@ -378,6 +450,7 @@
                             Para realizar un pedido, simplemente navega por nuestro catálogo de productos, selecciona los artículos que deseas, agrégalos al carrito de compras y sigue los pasos de pago. Puedes pagar con tarjeta de crédito, débito o transferencia bancaria.
                         </div>
                     </div>
+                    <!-- FAQ 2 -->
                     <div class="faq-item" onclick="toggleFAQ(this)">
                         <div class="faq-pregunta px-4 py-3">
                             <span>¿Cuánto tarda el envío y cómo lo rastreo?</span>
@@ -387,6 +460,7 @@
                             Los envíos tardan de 3 a 5 días hábiles. Al ser despachado, recibirás un correo con el número de seguimiento. También puedes ver este estado en tiempo real ingresando a "Mis compras" desde tu perfil.
                         </div>
                     </div>
+                    <!-- FAQ 3 -->
                     <div class="faq-item" onclick="toggleFAQ(this)">
                         <div class="faq-pregunta px-4 py-3">
                             <span>¿Qué métodos de pago aceptan?</span>
@@ -396,6 +470,7 @@
                             Aceptamos tarjetas de crédito (Visa, Mastercard, American Express), tarjetas de débito, transferencias bancarias y pagos a través de WebPay. Todos los pagos son 100% seguros.
                         </div>
                     </div>
+                    <!-- FAQ 4 -->
                     <div class="faq-item" onclick="toggleFAQ(this)">
                         <div class="faq-pregunta px-4 py-3">
                             <span>¿Cómo puedo devolver un producto?</span>
@@ -405,6 +480,7 @@
                             Si no estás satisfecho con tu compra, puedes devolver el producto en un plazo de 30 días desde la fecha de compra. El producto debe estar en su empaque original y en perfectas condiciones. Contáctanos para iniciar el proceso de devolución.
                         </div>
                     </div>
+                    <!-- FAQ 5 -->
                     <div class="faq-item" onclick="toggleFAQ(this)">
                         <div class="faq-pregunta px-4 py-3">
                             <span>¿No me llegó mi paquete qué hago?</span>
@@ -414,6 +490,7 @@
                             Si tu paquete no ha llegado en el tiempo estimado (3-5 días hábiles), por favor verifica el número de seguimiento en "Mis compras". Si pasaron más de 7 días, contáctanos para iniciar una investigación con la empresa de mensajería.
                         </div>
                     </div>
+                    <!-- FAQ 6 -->
                     <div class="faq-item" onclick="toggleFAQ(this)">
                         <div class="faq-pregunta px-4 py-3">
                             <span>¿Puedo cambiar mi dirección de envío?</span>
@@ -423,9 +500,100 @@
                             Sí, puedes cambiar tu dirección de envío siempre que el pedido no haya sido despachado. Ve a "Mis compras", selecciona el pedido y busca la opción "Modificar dirección". Si ya fue despachado, contacta al servicio de mensajería con tu número de seguimiento.
                         </div>
                     </div>
+                    <!-- FAQ 7 - NUEVA -->
+                    <div class="faq-item" onclick="toggleFAQ(this)">
+                        <div class="faq-pregunta px-4 py-3">
+                            <span>Mi producto llegó dañado ¿qué hago?</span>
+                            <i class="fas fa-chevron-down faq-icon"></i>
+                        </div>
+                        <div class="faq-respuesta px-4 pb-3">
+                            Lamento mucho que tu producto haya llegado dañado. Por favor, toma fotos del producto, del empaque y de la caja. Luego contáctanos a soporte@shopverse.com con las fotos y tu número de pedido. Te ofreceremos un reemplazo o reembolso completo en un plazo máximo de 48 horas.
+                        </div>
+                    </div>
+                    <!-- FAQ 8 - NUEVA -->
+                    <div class="faq-item" onclick="toggleFAQ(this)">
+                        <div class="faq-pregunta px-4 py-3">
+                            <span>¿Cómo contacto con servicio al cliente?</span>
+                            <i class="fas fa-chevron-down faq-icon"></i>
+                        </div>
+                        <div class="faq-respuesta px-4 pb-3">
+                            Puedes contactarnos por email a soporte@shopverse.com, por teléfono al +56 9 1234 5678 (Lun-Vie 9:00-18:00), o usando nuestro chat en vivo disponible en la página de soporte. También puedes usar nuestro Asistente IA 24/7 en la sección de chat.
+                        </div>
+                    </div>
+                    <!-- FAQ 9 - NUEVA -->
+                    <div class="faq-item" onclick="toggleFAQ(this)">
+                        <div class="faq-pregunta px-4 py-3">
+                            <span>¿Ofrecen garantía en los productos?</span>
+                            <i class="fas fa-chevron-down faq-icon"></i>
+                        </div>
+                        <div class="faq-respuesta px-4 pb-3">
+                            Sí, todos nuestros productos cuentan con garantía de 1 año contra defectos de fabricación. Para productos electrónicos, la garantía es de 2 años. Si presentas algún problema, contáctanos con tu número de pedido y te ayudaremos a gestionar la garantía.
+                        </div>
+                    </div>
+                    <!-- FAQ 10 - NUEVA -->
+                    <div class="faq-item" onclick="toggleFAQ(this)">
+                        <div class="faq-pregunta px-4 py-3">
+                            <span>¿Puedo cancelar mi pedido?</span>
+                            <i class="fas fa-chevron-down faq-icon"></i>
+                        </div>
+                        <div class="faq-respuesta px-4 pb-3">
+                            Sí, puedes cancelar tu pedido siempre que no haya sido despachado. Para cancelar, ve a "Mis compras", selecciona el pedido y haz clic en "Cancelar pedido". Si ya fue despachado, no podrás cancelarlo pero podrás devolverlo una vez recibido.
+                        </div>
+                    </div>
+                    <!-- FAQ 11 - NUEVA -->
+                    <div class="faq-item" onclick="toggleFAQ(this)">
+                        <div class="faq-pregunta px-4 py-3">
+                            <span>¿Cuánto cuesta el envío?</span>
+                            <i class="fas fa-chevron-down faq-icon"></i>
+                        </div>
+                        <div class="faq-respuesta px-4 pb-3">
+                            El costo de envío varía según tu ubicación y el peso del pedido. El costo se calcula automáticamente al ingresar tu dirección en el checkout. Ofrecemos envío gratis en compras superiores a $50.000.
+                        </div>
+                    </div>
+                    <!-- FAQ 12 - NUEVA -->
+                    <div class="faq-item" onclick="toggleFAQ(this)">
+                        <div class="faq-pregunta px-4 py-3">
+                            <span>¿Puedo cambiar mi contraseña?</span>
+                            <i class="fas fa-chevron-down faq-icon"></i>
+                        </div>
+                        <div class="faq-respuesta px-4 pb-3">
+                            Sí, puedes cambiar tu contraseña en cualquier momento desde tu perfil. Ve a "Configuración" y luego a "Seguridad". Allí encontrarás la opción para cambiar tu contraseña. También puedes solicitar un restablecimiento desde la página de inicio de sesión.
+                        </div>
+                    </div>
+                    <!-- FAQ 13 - NUEVA -->
+                    <div class="faq-item" onclick="toggleFAQ(this)">
+                        <div class="faq-pregunta px-4 py-3">
+                            <span>¿Dónde puedo ver mis pedidos anteriores?</span>
+                            <i class="fas fa-chevron-down faq-icon"></i>
+                        </div>
+                        <div class="faq-respuesta px-4 pb-3">
+                            Puedes ver todos tus pedidos anteriores en la sección "Mis compras" dentro de tu perfil. Allí encontrarás el historial completo de compras, el estado de cada pedido y los detalles de seguimiento.
+                        </div>
+                    </div>
+                    <!-- FAQ 14 - NUEVA -->
+                    <div class="faq-item" onclick="toggleFAQ(this)">
+                        <div class="faq-pregunta px-4 py-3">
+                            <span>¿Cómo funcionan los cupones de descuento?</span>
+                            <i class="fas fa-chevron-down faq-icon"></i>
+                        </div>
+                        <div class="faq-respuesta px-4 pb-3">
+                            Los cupones de descuento se pueden aplicar al momento de pagar en el carrito. Ingresa el código del cupón en el campo correspondiente y el descuento se aplicará automáticamente. Cada cupón tiene sus propias condiciones y vigencia.
+                        </div>
+                    </div>
+                    <!-- FAQ 15 - NUEVA -->
+                    <div class="faq-item" onclick="toggleFAQ(this)">
+                        <div class="faq-pregunta px-4 py-3">
+                            <span>¿Qué hago si olvidé mi contraseña?</span>
+                            <i class="fas fa-chevron-down faq-icon"></i>
+                        </div>
+                        <div class="faq-respuesta px-4 pb-3">
+                            Si olvidaste tu contraseña, ve a la página de inicio de sesión y haz clic en "¿Olvidaste tu contraseña?". Ingresa tu correo electrónico y recibirás un enlace para restablecer tu contraseña de forma segura.
+                        </div>
+                    </div>
                 </div>
             </div>
 
+            <!-- BUSCADOR Y GRABACIÓN -->
             <div class="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-100 rounded-2xl p-6">
                 <label for="buscador-problema" class="block text-gray-700 font-semibold mb-2">¿No encontraste lo que buscabas? Describe tu problema:</label>
                 <div class="relative">
@@ -452,8 +620,9 @@
              
     </main>
 
+    <!-- SCRIPTS -->
+    <script src="tienda/js/productos.js"></script>
     <script src="tienda/js/soporte.js"></script>
-    <script src="tienda/js/soportinfo.js"></script>
     <script src="tienda/js/sopotinfo.js"></script>
     <script src="tienda/js/app.js"></script>
 

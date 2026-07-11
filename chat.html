@@ -7,43 +7,24 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link rel="stylesheet" href="tienda/css/estilos.css">
+    <link rel="stylesheet" href="tienda/css/styles.css">
     <style>
         .chat-container { height: calc(100vh - 140px); }
         .burbuja-ia { border-bottom-left-radius: 4px; }
         .burbuja-usuario { border-bottom-right-radius: 4px; }
         
-        /* Animaciones para el chat */
-        .bubble-user {
-            animation: slideInRight 0.3s ease;
-        }
-        .bubble-ia {
-            animation: slideInLeft 0.3s ease;
-        }
+        .bubble-user { animation: slideInRight 0.3s ease; }
+        .bubble-ia { animation: slideInLeft 0.3s ease; }
         
         @keyframes slideInRight {
-            from {
-                opacity: 0;
-                transform: translateX(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
         }
-        
         @keyframes slideInLeft {
-            from {
-                opacity: 0;
-                transform: translateX(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
         }
         
-        /* Estrellas de calificación */
         #rating-estrellas i {
             transition: all 0.2s ease;
         }
@@ -51,31 +32,35 @@
             transform: scale(1.2);
         }
         
-        /* Botones de multimedia */
         #btn-adjuntar-imagen:hover,
         #btn-grabar-audio-chat:hover {
             transform: scale(1.05);
         }
         
-        /* Preview de imagen */
         #preview-imagen {
             transition: all 0.3s ease;
         }
         
-        /* Scroll personalizado */
+        /* ===== SCROLL PERSONALIZADO ===== */
+        #caja-mensajes {
+            scrollbar-width: thin !important;
+            scrollbar-color: #8b5cf6 #f1f1f1 !important;
+        }
         #caja-mensajes::-webkit-scrollbar {
-            width: 6px;
+            width: 6px !important;
         }
         #caja-mensajes::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
+            background: #f1f1f1 !important;
+            border-radius: 10px !important;
         }
         #caja-mensajes::-webkit-scrollbar-thumb {
-            background: #8b5cf6;
-            border-radius: 10px;
+            background: #8b5cf6 !important;
+            border-radius: 10px !important;
+        }
+        #caja-mensajes::-webkit-scrollbar-thumb:hover {
+            background: #7c3aed !important;
         }
 
-        /* Estilos para el input de audio */
         #btn-grabar-audio-chat.recording {
             background-color: #ef4444 !important;
             color: white !important;
@@ -87,13 +72,6 @@
             50% { transform: scale(1.1); }
         }
 
-        .mensaje-imagen {
-            max-width: 200px;
-            border-radius: 12px;
-            margin-top: 5px;
-        }  
-            
-        /* Modal Info */
         #modal-info {
             display: none;
             position: fixed;
@@ -109,6 +87,74 @@
         .modal-content {
             max-height: 90vh;
             overflow-y: auto;
+        }
+
+        /* ===== ICONOS AL EXTREMO DERECHO ===== */
+        .nav-icons-right {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-left: auto;
+        }
+        @media (min-width: 640px) {
+            .nav-icons-right { gap: 1rem; }
+        }
+
+        /* ===== INPUT CON BOTONES A LA DERECHA ===== */
+        .chat-input-wrapper {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .chat-input-wrapper .input-field {
+            flex: 1;
+            padding: 10px 16px;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+            outline: none;
+            font-size: 14px;
+            background: white;
+        }
+        .chat-input-wrapper .input-field:focus {
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
+        }
+        .chat-input-wrapper .btn-send {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+            padding: 10px 18px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .chat-input-wrapper .btn-send:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+        }
+        .chat-input-wrapper .btn-icon {
+            background: #f3f4f6;
+            color: #4b5563;
+            padding: 10px 12px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 16px;
+        }
+        .chat-input-wrapper .btn-icon:hover {
+            background: #e5e7eb;
+            transform: scale(1.05);
+        }
+        .chat-input-wrapper .btn-icon.recording {
+            background: #ef4444 !important;
+            color: white !important;
+            animation: pulse 1s infinite;
         }
     </style>
 </head>
@@ -134,15 +180,13 @@
                 </div>
             </div>
             
-            <!-- Botones del header -->
-            <div class="flex items-center gap-2">
-                <!-- NUEVO BOTÓN DE INFORMACIÓN -->
+            <div class="nav-icons-right">
                 <button id="btn-info" class="bg-white/10 hover:bg-white/20 p-2 rounded-lg transition text-sm flex items-center gap-1">
                     <i class="fas fa-info-circle"></i>
                     <span class="hidden sm:inline">Info</span>
                 </button>
                 <a href="index.html" class="bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg text-xs font-medium transition">
-                    Salir al Inicio
+                    Salir
                 </a>
             </div>
         </div>
@@ -159,9 +203,7 @@
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <div id="info-contenido">
-                <!-- Generado por infobot.js -->
-            </div>
+            <div id="info-contenido"></div>
         </div>
     </div>
 
@@ -181,7 +223,6 @@
 
             <div class="p-3 border-t border-gray-100 bg-gray-50 rounded-b-2xl">
                 <form id="form-chat" onsubmit="enviarMensajeUsuario(event)" class="flex flex-col gap-2">
-                    <!-- Vista previa de imagen adjunta -->
                     <div id="preview-imagen" class="hidden relative">
                         <img id="imagen-preview" src="" alt="Vista previa" class="max-h-32 rounded-lg border border-gray-300">
                         <button type="button" onclick="eliminarImagen()" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600 transition">
@@ -189,24 +230,23 @@
                         </button>
                     </div>
                     
-                    <!-- Estado de grabación -->
                     <div id="estado-grabacion-chat" class="hidden text-xs text-red-500 flex items-center gap-2">
                         <i class="fas fa-circle animate-pulse"></i>
                         <span>Grabando...</span>
                         <span id="tiempo-grabacion-chat">00:00</span>
                     </div>
                     
-                    <!-- Controles -->
-                    <div class="flex gap-2">
-                        <button type="button" id="btn-adjuntar-imagen" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 rounded-xl transition hover:scale-105" title="Adjuntar imagen">
+                    <!-- INPUT CON BOTONES A LA DERECHA -->
+                    <div class="chat-input-wrapper">
+                        <input type="text" id="input-mensaje" placeholder="Escribe tu mensaje aquí..." 
+                            class="input-field">
+                        <button type="button" id="btn-adjuntar-imagen" class="btn-icon" title="Adjuntar imagen">
                             <i class="fas fa-image"></i>
                         </button>
-                        <button type="button" id="btn-grabar-audio-chat" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 rounded-xl transition hover:scale-105" title="Grabar audio">
+                        <button type="button" id="btn-grabar-audio-chat" class="btn-icon" title="Grabar audio">
                             <i class="fas fa-microphone"></i>
                         </button>
-                        <input type="text" id="input-mensaje" placeholder="Escribe tu mensaje aquí..." 
-                            class="flex-1 px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm bg-white shadow-inner">
-                        <button type="submit" class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-5 rounded-xl font-medium hover:opacity-95 transition flex items-center justify-center shadow-md hover:scale-105">
+                        <button type="submit" class="btn-send">
                             <i class="fas fa-paper-plane"></i>
                         </button>
                     </div>
@@ -249,7 +289,7 @@
         </div>
     </footer>
 
-    <!-- Scripts -->
+    <script src="tienda/js/productos.js"></script>
     <script src="tienda/js/infobot.js"></script>
     <script src="tienda/js/chat.js"></script>
 </body>

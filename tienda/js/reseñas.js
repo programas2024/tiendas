@@ -1,7 +1,5 @@
 // ==================== SISTEMA DE RESEÑAS ====================
 
-let reseñas = {};
-
 function inicializarReseñas() {
     productos.forEach(p => {
         if (!reseñas[p.id]) {

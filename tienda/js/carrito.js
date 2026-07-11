@@ -1,5 +1,4 @@
 // ==================== CARRITO ====================
-let carrito = [];
 
 function agregarAlCarrito(productoId) {
     const producto = obtenerProductoPorId(productoId);
