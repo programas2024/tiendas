@@ -63,128 +63,267 @@ function esTemaPermitido(texto) {
     return false;
 }
 
-// ===== RESPUESTAS DE LA IA (MÁS INTELIGENTE) =====
+// ===== RESPUESTAS DE LA IA (MÁS INTELIGENTE Y ESPECÍFICA) =====
 function procesarIntencionIA(entrada) {
     const frase = entrada.toLowerCase();
     
-    // ===== DETECCIÓN DE PETICIONES ESPECÍFICAS =====
+    // ===== DETECCIÓN DE CONTEXTO AVANZADA =====
+    const esProblemaPago = /\b(pago|pagar|tarjeta|cr[eé]dito|debito|webpay|transferencia|cobr[ao]|factura|boleta|rechaz[ao]|negado|declin[ao]|m[eé]todo)\b/i.test(frase);
+    const esProblemaEnvio = /\b(env[ií]o|envia|envi[ao]|lleg[oó]|llega|paquete|despacho|seguimiento|rastre[ao]|tracking|direcci[oó]n|domicilio|mensajer[ií]a|no llega|no lleg[oó]|demora|tard[eao]|retras[ao]|aún no|aun no|todavía no|todavia no)\b/i.test(frase);
+    const esProblemaProducto = /\b(producto|productos|catalogo|disponible|precio|stock|modelo|marca|talla|color|tamaño)\b/i.test(frase);
+    const esProblemaDevolucion = /\b(devolver|devoluci[oó]n|cambiar|cambio|reembolso|garant[ií]a|regresar|retorn[ao]|insatisfecho|dañado|roto|quebrado|maltratado|golpeado|defectuoso|falla|estropeado|defecto)\b/i.test(frase);
+    const esProblemaCuenta = /\b(cuenta|perfil|usuario|contraseña|clave|password|email|correo|registro|sesi[oó]n|olvid[eé]|recuperar|restablecer)\b/i.test(frase);
+    const esProblemaCupon = /\b(cup[óo]n|cupon|descuento|c[dó]digo|promoci[oó]n|oferta|voucher)\b/i.test(frase);
+    const esProblemaSoporte = /\b(asesor|persona|humano|agente|hablar|comunicar|atencion|contactar|servicio)\b/i.test(frase);
     
-    // 1. SOLICITUD DE ASESOR / PERSONA
-    if (frase.includes('asesor') || frase.includes('persona') || frase.includes('humano') || 
-        frase.includes('agente') || frase.includes('hablar con alguien') || frase.includes('atendeme') ||
-        frase.includes('quiero hablar con') || frase.includes('me comunique') || 
-        frase.includes('con un asesor') || frase.includes('atención personalizada')) {
-        return `👤 ¡Claro! Entiendo que necesitas hablar con un asesor humano.
-
-📋 Por favor, sigue estos pasos:
-1️⃣ Escribe "SÍ" para confirmar que quieres ser transferido a un asesor
-2️⃣ Un agente de soporte te atenderá en breve (tiempo estimado: < 2 minutos)
-
-O si prefieres, puedes escribir tu consulta detallada y yo mismo puedo ayudarte. ¿Qué prefieres? 🤔`;
-    }
+    // ===== RESPUESTAS DETALLADAS POR CONTEXTO =====
     
-    // 2. CONFIRMACIÓN DE TRANSFERENCIA A ASESOR
-    if (frase.includes('si') && (frase.includes('transferir') || frase.includes('asesor') || 
-        frase.includes('confirmo') || frase.includes('acepto'))) {
-        return `✅ ¡Perfecto! He enviado tu solicitud a un asesor humano.
+    // 1. PROBLEMAS DE PAGO
+    if (esProblemaPago) {
+        if (frase.includes('rechaz') || frase.includes('negado') || frase.includes('declin')) {
+            return `💳 **Tu pago fue rechazado.** Esto puede ocurrir por:
+            
+🔹 **Fondos insuficientes** - Verifica tu saldo disponible.
+🔹 **Límite diario** - Algunas tarjetas tienen límites por día.
+🔹 **Datos incorrectos** - Revisa el número, fecha y CVV.
+🔹 **Bloqueo de seguridad** - Tu banco pudo bloquear la operación por seguridad.
 
-⏳ Tiempo estimado de espera: menos de 2 minutos
+📌 **Recomendación:** Contacta a tu banco para autorizar la compra o prueba con otro método de pago.
 
-Mientras tanto, puedes escribir tu consulta para que el asesor la tenga lista cuando te atienda. 📝
-
-🔔 Recibirás una notificación cuando el asesor esté disponible.`;
-    }
-    
-    // 3. SALUDOS
-    if (frase.includes('hola') || frase.includes('buenos dias') || frase.includes('buenas tardes') || frase.includes('buenas noches')) {
-        return `¡Hola! 👋 Bienvenido a ShopVerse. ¿Cómo puedo ayudarte hoy? 📦 Puedo asistirte con envíos, pagos, devoluciones o cualquier duda sobre tu compra. ¡Cuéntame! 😊`;
-    }
-    
-    // 4. DESPEDIDAS
-    if (frase.includes('chao') || frase.includes('adios') || frase.includes('bye') || frase.includes('gracias') && frase.includes('todo')) {
-        chatTerminado = true;
-        return `¡Fue un placer ayudarte! 🙌 Si necesitas algo más, aquí estaré. ¡Que tengas un excelente día! 🌟`;
-    }
-    
-    // 5. AGRADECIMIENTO (sin despedida)
-    if (frase.includes('gracias') && !frase.includes('todo')) {
-        return `¡De nada! 😊 ¿Necesitas ayuda con algo más? Estoy aquí para lo que necesites. 💪`;
-    }
-    
-    // ===== DETECCIÓN AVANZADA POR CONTEXTO =====
-    const esDemora = /\b(demora|tard[eao]|retras[ao]|aún no|aun no|todavía no|todavia no|no ha llegado|no me ha llegado|pasaron \d+|han pasado \d+|d[ií]as)\b/i.test(frase);
-    const esEnvio = /\b(env[ií]o|envia|envi[ao]|lleg[oó]|llega|paquete|despacho|seguimiento|rastre[ao]|tracking|direcci[oó]n|domicilio|mensajer[ií]a|no llega|no lleg[oó])\b/i.test(frase);
-    const esDano = /\b(dañado|roto|quebrado|maltratado|golpeado|defectuoso|falla|estropeado|defecto)\b/i.test(frase);
-    const esDevolucion = /\b(devolver|devoluci[oó]n|cambiar|cambio|reembolso|garant[ií]a|regresar|retorn[ao]|devolver)\b/i.test(frase);
-    const esPago = /\b(pago|pagar|tarjeta|cr[eé]dito|debito|webpay|transferencia|cobr[ao]|factura|boleta|m[eé]todo)\b/i.test(frase);
-    const esCuenta = /\b(cuenta|perfil|usuario|contraseña|clave|password|email|correo|registro|sesi[oó]n)\b/i.test(frase);
-    const esProducto = /\b(producto|productos|catalogo|disponible|precio|stock|modelo|marca)\b/i.test(frase);
-    
-    // PRODUCTO DAÑADO
-    if (esDano) {
-        return `😔 Lamento mucho que tu producto haya llegado en mal estado. 
-
-📋 Por favor, sigue estos pasos:
-1️⃣ Toma fotos del producto dañado
-2️⃣ Toma fotos del empaque y la caja
-3️⃣ Envía las fotos a soporte@shopverse.com con tu número de pedido
-
-🔄 Te ofreceremos un reemplazo completo o un reembolso en un plazo máximo de 48 horas.
-
-¿Necesitas que te ayude con algo más? 🤝`;
-    }
-    
-    // ENVÍO / DEMORA
-    if (esEnvio || esDemora) {
-        if (esDemora) {
-            return `📦 ¡Entiendo tu preocupación! Los envíos de ShopVerse tienen un tiempo estimado de 3 a 5 días hábiles. Si ya pasaron más de 7 días desde tu compra, por favor escríbenos a soporte@shopverse.com con tu número de pedido y te daremos prioridad para investigar con la empresa de mensajería. 🚀
-
-Mientras tanto, puedes verificar el estado en <b>'Mis Compras'</b> desde tu perfil. ¿Tienes tu código de seguimiento a la mano?`;
+¿Necesitas ayuda con otro método de pago? 🤔`;
         }
-        return `📦 Para revisar el estado de tu pedido, ve a la sección <b>'Mis Compras'</b> en tu perfil. Allí encontrarás el número de seguimiento y la fecha estimada de entrega. 🚚 Si necesitas más ayuda, ¡estoy aquí! 😊`;
+        return `💳 **Métodos de pago disponibles en ShopVerse:**
+
+✅ **Tarjetas de crédito/débito:** Visa, Mastercard, American Express
+✅ **WebPay** - Pago seguro en línea
+✅ **Transferencia bancaria** - Recibirás los datos al finalizar
+
+🔒 **Seguridad:** Todos los pagos están encriptados con SSL de 256 bits.
+
+💰 **¿Tienes algún problema específico con tu pago?** Cuéntame y te ayudo paso a paso.`;
     }
     
-    // DEVOLUCIÓN
-    if (esDevolucion) {
-        return `🔄 ¡Claro que sí! En ShopVerse tienes 30 días para devolver productos desde su recepción. El artículo debe estar en su empaque original y sin uso. 📦 ¿Quieres que te ayude a generar una solicitud de devolución? Solo necesito tu número de pedido. ✨`;
+    // 2. PROBLEMAS DE ENVÍO
+    if (esProblemaEnvio) {
+        if (frase.includes('no llega') || frase.includes('no llegó') || frase.includes('demora') || frase.includes('tarda')) {
+            return `📦 **Lamento que tu pedido no haya llegado.** 
+
+🔍 **Pasos a seguir:**
+1️⃣ Revisa el número de **seguimiento** en "Mis compras"
+2️⃣ Verifica que la dirección sea correcta
+3️⃣ Contacta a la mensajería con tu código de tracking
+
+⏱️ **Tiempos estimados:**
+• Santiago: 1-2 días hábiles
+• Regiones: 3-5 días hábiles
+• Zonas extremas: 5-7 días hábiles
+
+📞 Si pasaron más de 7 días, escríbenos a **soporte@shopverse.com** con tu número de pedido y te daremos prioridad.
+
+¿Tienes tu código de seguimiento? 🔢`;
+        }
+        return `📦 **Información de envíos ShopVerse:**
+
+🚚 **Plazos de entrega:** 3-5 días hábiles
+📬 **Seguimiento:** Recibirás un correo con tu código de tracking
+📍 **Cambio de dirección:** Posible antes del despacho
+
+💡 **Consejo:** Revisa siempre tu correo (incluyendo spam) para no perder las actualizaciones de tu pedido.
+
+¿Quieres rastrear un pedido específico? 🧐`;
     }
     
-    // PAGO
-    if (esPago) {
-        return `💳 Aceptamos múltiples métodos de pago: Tarjetas de crédito/débito (Visa, Mastercard, American Express), WebPay y transferencias bancarias. Todos los pagos son 100% seguros con encriptación SSL. 🔒 ¿Tienes algún problema con un pago en particular?`;
+    // 3. DEVOLUCIONES Y GARANTÍA
+    if (esProblemaDevolucion) {
+        if (frase.includes('dañado') || frase.includes('roto') || frase.includes('defectuoso')) {
+            return `😔 **Lamento mucho que tu producto haya llegado en mal estado.**
+
+📋 **Procedimiento para productos dañados:**
+1️⃣ Toma **fotos claras** del producto dañado
+2️⃣ Toma **fotos del empaque** (caja, burbujas, etc.)
+3️⃣ Envía las fotos a **soporte@shopverse.com** con tu **número de pedido**
+
+🔄 **Opciones disponibles:**
+• Reemplazo completo sin costo
+• Reembolso total (100% del valor)
+• Bono de compensación para futuras compras
+
+⏱️ **Tiempo de respuesta:** Máximo 48 horas hábiles.
+
+¿Necesitas ayuda con el proceso de devolución? 🤝`;
+        }
+        return `🔄 **Política de devoluciones ShopVerse:**
+
+✅ **Plazo:** 30 días desde la fecha de compra
+📦 **Condiciones:** Producto en empaque original, sin uso
+💵 **Reembolso:** Se acredita en tu método de pago original
+
+**Pasos para devolver:**
+1. Contáctanos con tu número de pedido
+2. Te enviaremos una guía de devolución
+3. Empaqueta el producto de forma segura
+4. Envíalo por mensajería (sin costo adicional)
+
+¿Quieres iniciar una devolución ahora? 🔄`;
     }
     
-    // CUENTA
-    if (esCuenta) {
+    // 4. PROBLEMAS DE CUENTA
+    if (esProblemaCuenta) {
         if (frase.includes('contraseña') || frase.includes('clave') || frase.includes('password')) {
-            return `🔐 Para cambiar tu contraseña, ve a tu perfil → Configuración → Seguridad. Allí podrás establecer una nueva contraseña. Si olvidaste tu contraseña, usa la opción "¿Olvidaste tu contraseña?" en el inicio de sesión. 📧 Recibirás un enlace para restablecerla.`;
+            return `🔐 **Cambio/Recuperación de contraseña:**
+
+🔑 **Si olvidaste tu contraseña:**
+1. Ve a la página de inicio de sesión
+2. Haz clic en **"¿Olvidaste tu contraseña?"**
+3. Ingresa tu email y te llegará un enlace de restablecimiento
+
+🛡️ **Cambiar contraseña (estando logueado):**
+1. Ve a tu **perfil** → **Configuración**
+2. Selecciona **Seguridad** → **Cambiar contraseña**
+3. Ingresa tu contraseña actual y la nueva (mínimo 8 caracteres)
+
+⚠️ **Recomendación:** Usa una contraseña segura con mayúsculas, números y símbolos.
+
+¿Necesitas más ayuda con tu cuenta? 👤`;
         }
-        return `👤 Puedes gestionar tu cuenta en el perfil de usuario. Desde allí puedes ver tus compras, favoritos, y configurar tus datos. 🔐 ¿Necesitas ayuda con algo específico de tu cuenta?`;
+        return `👤 **Gestión de cuenta ShopVerse:**
+
+📋 **Desde tu perfil puedes:**
+• Ver historial de compras
+• Administrar direcciones de envío
+• Cambiar datos personales
+• Configurar notificaciones
+• Ver favoritos
+
+🔐 **Seguridad:** Tus datos están protegidos con encriptación avanzada.
+
+¿Qué necesitas hacer específicamente en tu cuenta? 🤔`;
     }
     
-    // PRODUCTO
-    if (esProducto) {
-        return `🛍️ En ShopVerse tenemos un amplio catálogo de productos. Puedes navegar por categorías usando el menú de categorías. 🏷️ También puedes usar el buscador para encontrar productos específicos. ¿Qué tipo de producto buscas? 🤔`;
+    // 5. CUPONES Y DESCUENTOS
+    if (esProblemaCupon) {
+        return `🎫 **Cupones de descuento ShopVerse:**
+
+💰 **¿Cómo aplicar un cupón?**
+1. Agrega productos a tu carrito
+2. Ve al carrito de compras
+3. Ingresa el código en el campo **"Cupón"**
+4. Haz clic en **"Aplicar"**
+
+📌 **Condiciones:**
+• Un cupón por compra
+• Válido por tiempo limitado
+• No acumulable con otras ofertas
+
+🎁 **¿No tienes cupón?** 
+Suscríbete a nuestro newsletter para recibir descuentos exclusivos.
+
+¿Tienes un código que no funciona? Revísalo o contáctanos.`;
+    }
+    
+    // 6. SOPORTE / HABLAR CON ASESOR
+    if (esProblemaSoporte) {
+        return `👤 **Contacto con soporte humano:**
+
+📞 **Opciones disponibles:**
+• 📧 **Email:** soporte@shopverse.com (respuesta en 24h)
+• 📱 **Teléfono:** +56 9 1234 5678 (Lun-Vie 9:00-18:00)
+• 💬 **Chat en vivo:** Disponible en soporte.html
+
+⏰ **Horario de atención:**
+Lunes a Viernes: 9:00 - 18:00 hrs
+Sábados: 10:00 - 14:00 hrs
+
+🤖 **Mientras esperas...** 
+Puedo ayudarte con la mayoría de los problemas. Cuéntame tu consulta y si no puedo resolverla, te transferiré a un asesor.
+
+¿Qué problema tienes? Estoy aquí para ayudarte. 😊`;
+    }
+    
+    // 7. SALUDOS Y DESPEDIDAS
+    if (frase.includes('hola') || frase.includes('buenos dias') || frase.includes('buenas tardes') || frase.includes('buenas noches')) {
+        return `¡Hola! 👋 Soy tu asistente virtual de ShopVerse. 
+
+📦 Puedo ayudarte con:
+• **Envíos** y seguimiento 🚚
+• **Pagos** y métodos 💳
+• **Devoluciones** y garantía 🔄
+• **Productos** y catálogo 🛍️
+• **Cuenta** y perfil 👤
+• **Cupones** y descuentos 🎫
+
+¿En qué puedo asistirte hoy? ¡Cuéntame tu consulta! 😊`;
+    }
+    
+    if (frase.includes('chao') || frase.includes('adios') || frase.includes('bye') || (frase.includes('gracias') && frase.includes('todo'))) {
+        chatTerminado = true;
+        return `¡Ha sido un placer ayudarte! 🙌 
+
+🌟 **¿Te fue útil mi atención?** Me encantaría saber tu opinión.
+
+🔔 Si necesitas algo más, aquí estaré para ti. 
+¡Que tengas un excelente día y disfruta de tus compras en ShopVerse! 🛍️✨`;
+    }
+    
+    if (frase.includes('gracias')) {
+        return `¡De nada! 😊 Es un gusto ayudarte. 
+
+💡 ¿Necesitas ayuda con algo más? Puedo asistirte con:
+• Seguimiento de pedidos
+• Problemas con pagos
+• Devoluciones
+• Información de productos
+• Gestión de cuenta
+
+¡Estoy aquí para lo que necesites! 💪`;
+    }
+    
+    // ===== CONSULTA GENÉRICA PERO VÁLIDA =====
+    if (esTemaPermitido(frase)) {
+        return `🤔 **Entiendo tu consulta.** Para ayudarte mejor, necesito un poco más de contexto.
+
+📌 **¿Podrías especificar?**
+• ¿Es sobre un **pedido** que realizaste?
+• ¿Tienes problemas con un **pago**?
+• ¿Necesitas información sobre **devoluciones**?
+• ¿Quieres saber sobre **productos** o **precios**?
+• ¿Es un tema de tu **cuenta** o **perfil**?
+
+📝 **Ejemplo:** "Mi pedido #1234 no ha llegado y ya pasaron 5 días"
+
+¡Cuéntame más y te daré una solución precisa! 🎯`;
     }
     
     // ===== TEMA NO PERMITIDO =====
     if (!esTemaPermitido(frase)) {
-        return `😅 Lo siento, solo puedo ayudarte con temas relacionados a ShopVerse. ` +
-               `Pregúntame sobre: 📦 Envíos, 💳 Pagos, 🔄 Devoluciones, 🛒 Productos, ` +
-               `👤 Cuenta y más. ¿En qué más puedo asistirte hoy? 🛍️`;
+        return `😅 **Lo siento, solo puedo ayudarte con temas relacionados a ShopVerse.**
+
+📌 **Temas que manejo:**
+• 📦 Envíos y seguimiento
+• 💳 Pagos y métodos
+• 🔄 Devoluciones y cambios
+• 🛍️ Productos y catálogo
+• 👤 Cuenta y perfil
+• 🎫 Cupones y descuentos
+
+**¿Tienes alguna consulta sobre tu compra o nuestra tienda?** 
+¡Estoy aquí para ayudarte! 🛒✨`;
     }
     
     // ===== RESPUESTA POR DEFECTO (INTELIGENTE) =====
-    return `🤔 Entiendo tu consulta. Déjame analizarla mejor... 🧠
+    return `🤔 **Analizando tu consulta...**
 
-📌 Para ayudarte mejor, ¿podrías darme más detalles sobre tu situación? Puedo asistirte con:
-• 📦 Estado de envíos
-• 💳 Problemas con pagos
-• 🔄 Devoluciones y cambios
-• 🛍️ Información de productos
-• 👤 Gestión de cuenta
-• 📦 Productos dañados o defectuosos
-• 👨‍💼 Hablar con un asesor humano
+💡 Para darte la mejor respuesta, necesito un poco más de información.
+
+📌 **Preguntas que puedo responder:**
+• ¿Cómo rastreo mi pedido?
+• ¿Cuánto tarda el envío?
+• ¿Cómo devuelvo un producto?
+• ¿Qué métodos de pago aceptan?
+• ¿Cómo cambio mi contraseña?
+• ¿Cómo aplico un cupón?
+
+✍️ **Escríbeme con más detalles** y te daré una solución precisa y rápida.
 
 ¡Estoy aquí para ayudarte! 😊✨`;
 }

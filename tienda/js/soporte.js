@@ -570,6 +570,23 @@ function mostrarToast(title, text, icon = 'success') {
     });
 }
 
+// ===== CONTROL DE PREGUNTAS FRECUENTES =====
+function toggleFAQs() {
+    const ocultas = document.getElementById('faqs-ocultas');
+    const btnTexto = document.getElementById('btn-ver-mas-texto');
+    const btnIcono = document.getElementById('btn-ver-mas-icono');
+    
+    if (ocultas.style.display === 'none') {
+        ocultas.style.display = 'block';
+        btnTexto.textContent = 'Ver menos preguntas';
+        btnIcono.className = 'fas fa-chevron-up';
+    } else {
+        ocultas.style.display = 'none';
+        btnTexto.textContent = 'Ver más preguntas';
+        btnIcono.className = 'fas fa-chevron-down';
+    }
+}
+
 // ===== INICIALIZACIÓN =====
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🔧 Sistema de soporte mejorado inicializado');

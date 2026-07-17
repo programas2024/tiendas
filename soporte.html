@@ -153,12 +153,36 @@
             animation: pulse 2s infinite;
         }
 
+        /* EVITAR MOVIMIENTO AL BUSCAR */
+        #contenedor-faqs {
+            overflow: visible !important;
+            max-height: none !important;
+        }
+
+        .faq-item {
+            transition: none !important; /* Evita animaciones que causen movimiento */
+        }
+
+        .faq-item .faq-respuesta {
+            display: none;
+            transition: none !important;
+        }
+
+        .faq-item.active .faq-respuesta {
+            display: block;
+        }
+
+        /* Scroll general de la página (normal) */
+        html {
+            scroll-behavior: smooth;
+        }
+
         /* ===== SCROLL PERSONALIZADO ===== */
         #contenedor-faqs {
             scrollbar-width: thin !important;
             scrollbar-color: #8b5cf6 #f1f1f1 !important;
-            max-height: 600px;
-            overflow-y: auto;
+            /* max-height: 600px;
+            overflow-y: auto; */
         }
         #contenedor-faqs::-webkit-scrollbar {
             width: 6px !important;
@@ -432,14 +456,14 @@
             </div>
         </div>
 
-        <!-- ==================== PREGUNTAS FRECUENTES (MÁS PREGUNTAS) ==================== -->
+        <!-- PREGUNTAS FRECUENTES CON VER MÁS -->
         <div class="mb-12">
             <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
                 <i class="fas fa-question-circle text-purple-600"></i> Preguntas Frecuentes
                 <span class="badge-soporte ml-2">+15 FAQs</span>
             </h2>
             <div class="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 mb-6">
-                <div id="contenedor-faqs">
+                <div id="contenedor-faqs" style="max-height: 600px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #8b5cf6 #f1f1f1;">
                     <!-- FAQ 1 -->
                     <div class="faq-item" onclick="toggleFAQ(this)">
                         <div class="faq-pregunta px-4 py-3">
@@ -447,7 +471,7 @@
                             <i class="fas fa-chevron-down faq-icon"></i>
                         </div>
                         <div class="faq-respuesta px-4 pb-3">
-                            Para realizar un pedido, simplemente navega por nuestro catálogo de productos, selecciona los artículos que deseas, agrégalos al carrito de compras y sigue los pasos de pago. Puedes pagar con tarjeta de crédito, débito o transferencia bancaria.
+                            Para realizar un pedido, simplemente navega por nuestro catálogo de productos, selecciona los artículos que deseas, agrégalos al carrito de compras y sigue los pasos de pago.
                         </div>
                     </div>
                     <!-- FAQ 2 -->
@@ -457,7 +481,7 @@
                             <i class="fas fa-chevron-down faq-icon"></i>
                         </div>
                         <div class="faq-respuesta px-4 pb-3">
-                            Los envíos tardan de 3 a 5 días hábiles. Al ser despachado, recibirás un correo con el número de seguimiento. También puedes ver este estado en tiempo real ingresando a "Mis compras" desde tu perfil.
+                            Los envíos tardan de 3 a 5 días hábiles. Recibirás un correo con el número de seguimiento. También puedes ver el estado en "Mis compras".
                         </div>
                     </div>
                     <!-- FAQ 3 -->
@@ -467,7 +491,7 @@
                             <i class="fas fa-chevron-down faq-icon"></i>
                         </div>
                         <div class="faq-respuesta px-4 pb-3">
-                            Aceptamos tarjetas de crédito (Visa, Mastercard, American Express), tarjetas de débito, transferencias bancarias y pagos a través de WebPay. Todos los pagos son 100% seguros.
+                            Aceptamos tarjetas de crédito (Visa, Mastercard, American Express), tarjetas de débito, transferencias bancarias y WebPay.
                         </div>
                     </div>
                     <!-- FAQ 4 -->
@@ -477,7 +501,7 @@
                             <i class="fas fa-chevron-down faq-icon"></i>
                         </div>
                         <div class="faq-respuesta px-4 pb-3">
-                            Si no estás satisfecho con tu compra, puedes devolver el producto en un plazo de 30 días desde la fecha de compra. El producto debe estar en su empaque original y en perfectas condiciones. Contáctanos para iniciar el proceso de devolución.
+                            Puedes devolver el producto en un plazo de 30 días desde la compra. Debe estar en su empaque original y en perfectas condiciones.
                         </div>
                     </div>
                     <!-- FAQ 5 -->
@@ -487,125 +511,134 @@
                             <i class="fas fa-chevron-down faq-icon"></i>
                         </div>
                         <div class="faq-respuesta px-4 pb-3">
-                            Si tu paquete no ha llegado en el tiempo estimado (3-5 días hábiles), por favor verifica el número de seguimiento en "Mis compras". Si pasaron más de 7 días, contáctanos para iniciar una investigación con la empresa de mensajería.
+                            Verifica el número de seguimiento en "Mis compras". Si pasaron más de 7 días, contáctanos para iniciar una investigación.
                         </div>
                     </div>
-                    <!-- FAQ 6 -->
-                    <div class="faq-item" onclick="toggleFAQ(this)">
-                        <div class="faq-pregunta px-4 py-3">
-                            <span>¿Puedo cambiar mi dirección de envío?</span>
-                            <i class="fas fa-chevron-down faq-icon"></i>
+
+                    <!-- FAQ OCULTAS (INICIALMENTE) -->
+                    <div id="faqs-ocultas" style="display: none;">
+                        <!-- FAQ 6 -->
+                        <div class="faq-item" onclick="toggleFAQ(this)">
+                            <div class="faq-pregunta px-4 py-3">
+                                <span>¿Puedo cambiar mi dirección de envío?</span>
+                                <i class="fas fa-chevron-down faq-icon"></i>
+                            </div>
+                            <div class="faq-respuesta px-4 pb-3">
+                                Sí, siempre que el pedido no haya sido despachado. Ve a "Mis compras" y busca "Modificar dirección".
+                            </div>
                         </div>
-                        <div class="faq-respuesta px-4 pb-3">
-                            Sí, puedes cambiar tu dirección de envío siempre que el pedido no haya sido despachado. Ve a "Mis compras", selecciona el pedido y busca la opción "Modificar dirección". Si ya fue despachado, contacta al servicio de mensajería con tu número de seguimiento.
+                        <!-- FAQ 7 -->
+                        <div class="faq-item" onclick="toggleFAQ(this)">
+                            <div class="faq-pregunta px-4 py-3">
+                                <span>Mi producto llegó dañado ¿qué hago?</span>
+                                <i class="fas fa-chevron-down faq-icon"></i>
+                            </div>
+                            <div class="faq-respuesta px-4 pb-3">
+                                Toma fotos del producto y empaque. Envía a soporte@shopverse.com con tu número de pedido. Te ofreceremos reemplazo o reembolso en 48 horas.
+                            </div>
+                        </div>
+                        <!-- FAQ 8 -->
+                        <div class="faq-item" onclick="toggleFAQ(this)">
+                            <div class="faq-pregunta px-4 py-3">
+                                <span>¿Cómo contacto con servicio al cliente?</span>
+                                <i class="fas fa-chevron-down faq-icon"></i>
+                            </div>
+                            <div class="faq-respuesta px-4 pb-3">
+                                Email: soporte@shopverse.com | Teléfono: +56 9 1234 5678 | Chat en vivo en la página de soporte.
+                            </div>
+                        </div>
+                        <!-- FAQ 9 -->
+                        <div class="faq-item" onclick="toggleFAQ(this)">
+                            <div class="faq-pregunta px-4 py-3">
+                                <span>¿Ofrecen garantía en los productos?</span>
+                                <i class="fas fa-chevron-down faq-icon"></i>
+                            </div>
+                            <div class="faq-respuesta px-4 pb-3">
+                                Sí, 1 año contra defectos de fabricación. Electrónicos: 2 años. Contáctanos para gestionarla.
+                            </div>
+                        </div>
+                        <!-- FAQ 10 -->
+                        <div class="faq-item" onclick="toggleFAQ(this)">
+                            <div class="faq-pregunta px-4 py-3">
+                                <span>¿Puedo cancelar mi pedido?</span>
+                                <i class="fas fa-chevron-down faq-icon"></i>
+                            </div>
+                            <div class="faq-respuesta px-4 pb-3">
+                                Sí, si no ha sido despachado. Ve a "Mis compras" y selecciona "Cancelar pedido".
+                            </div>
+                        </div>
+                        <!-- FAQ 11 -->
+                        <div class="faq-item" onclick="toggleFAQ(this)">
+                            <div class="faq-pregunta px-4 py-3">
+                                <span>¿Cuánto cuesta el envío?</span>
+                                <i class="fas fa-chevron-down faq-icon"></i>
+                            </div>
+                            <div class="faq-respuesta px-4 pb-3">
+                                Varía según ubicación y peso. Se calcula en el checkout. Envío gratis en compras > $50.000.
+                            </div>
+                        </div>
+                        <!-- FAQ 12 -->
+                        <div class="faq-item" onclick="toggleFAQ(this)">
+                            <div class="faq-pregunta px-4 py-3">
+                                <span>¿Puedo cambiar mi contraseña?</span>
+                                <i class="fas fa-chevron-down faq-icon"></i>
+                            </div>
+                            <div class="faq-respuesta px-4 pb-3">
+                                Sí, desde tu perfil → Configuración → Seguridad. También puedes restablecerla desde el login.
+                            </div>
+                        </div>
+                        <!-- FAQ 13 -->
+                        <div class="faq-item" onclick="toggleFAQ(this)">
+                            <div class="faq-pregunta px-4 py-3">
+                                <span>¿Dónde veo mis pedidos anteriores?</span>
+                                <i class="fas fa-chevron-down faq-icon"></i>
+                            </div>
+                            <div class="faq-respuesta px-4 pb-3">
+                                En "Mis compras" dentro de tu perfil. Allí está todo tu historial y seguimiento.
+                            </div>
+                        </div>
+                        <!-- FAQ 14 -->
+                        <div class="faq-item" onclick="toggleFAQ(this)">
+                            <div class="faq-pregunta px-4 py-3">
+                                <span>¿Cómo funcionan los cupones?</span>
+                                <i class="fas fa-chevron-down faq-icon"></i>
+                            </div>
+                            <div class="faq-respuesta px-4 pb-3">
+                                Ingresa el código en el carrito al pagar. El descuento se aplica automáticamente. Cada cupón tiene condiciones.
+                            </div>
+                        </div>
+                        <!-- FAQ 15 -->
+                        <div class="faq-item" onclick="toggleFAQ(this)">
+                            <div class="faq-pregunta px-4 py-3">
+                                <span>¿Qué hago si olvidé mi contraseña?</span>
+                                <i class="fas fa-chevron-down faq-icon"></i>
+                            </div>
+                            <div class="faq-respuesta px-4 pb-3">
+                                En el login, haz clic en "¿Olvidaste tu contraseña?". Ingresa tu email y recibirás un enlace para restablecerla.
+                            </div>
                         </div>
                     </div>
-                    <!-- FAQ 7 - NUEVA -->
-                    <div class="faq-item" onclick="toggleFAQ(this)">
-                        <div class="faq-pregunta px-4 py-3">
-                            <span>Mi producto llegó dañado ¿qué hago?</span>
-                            <i class="fas fa-chevron-down faq-icon"></i>
-                        </div>
-                        <div class="faq-respuesta px-4 pb-3">
-                            Lamento mucho que tu producto haya llegado dañado. Por favor, toma fotos del producto, del empaque y de la caja. Luego contáctanos a soporte@shopverse.com con las fotos y tu número de pedido. Te ofreceremos un reemplazo o reembolso completo en un plazo máximo de 48 horas.
-                        </div>
-                    </div>
-                    <!-- FAQ 8 - NUEVA -->
-                    <div class="faq-item" onclick="toggleFAQ(this)">
-                        <div class="faq-pregunta px-4 py-3">
-                            <span>¿Cómo contacto con servicio al cliente?</span>
-                            <i class="fas fa-chevron-down faq-icon"></i>
-                        </div>
-                        <div class="faq-respuesta px-4 pb-3">
-                            Puedes contactarnos por email a soporte@shopverse.com, por teléfono al +56 9 1234 5678 (Lun-Vie 9:00-18:00), o usando nuestro chat en vivo disponible en la página de soporte. También puedes usar nuestro Asistente IA 24/7 en la sección de chat.
-                        </div>
-                    </div>
-                    <!-- FAQ 9 - NUEVA -->
-                    <div class="faq-item" onclick="toggleFAQ(this)">
-                        <div class="faq-pregunta px-4 py-3">
-                            <span>¿Ofrecen garantía en los productos?</span>
-                            <i class="fas fa-chevron-down faq-icon"></i>
-                        </div>
-                        <div class="faq-respuesta px-4 pb-3">
-                            Sí, todos nuestros productos cuentan con garantía de 1 año contra defectos de fabricación. Para productos electrónicos, la garantía es de 2 años. Si presentas algún problema, contáctanos con tu número de pedido y te ayudaremos a gestionar la garantía.
-                        </div>
-                    </div>
-                    <!-- FAQ 10 - NUEVA -->
-                    <div class="faq-item" onclick="toggleFAQ(this)">
-                        <div class="faq-pregunta px-4 py-3">
-                            <span>¿Puedo cancelar mi pedido?</span>
-                            <i class="fas fa-chevron-down faq-icon"></i>
-                        </div>
-                        <div class="faq-respuesta px-4 pb-3">
-                            Sí, puedes cancelar tu pedido siempre que no haya sido despachado. Para cancelar, ve a "Mis compras", selecciona el pedido y haz clic en "Cancelar pedido". Si ya fue despachado, no podrás cancelarlo pero podrás devolverlo una vez recibido.
-                        </div>
-                    </div>
-                    <!-- FAQ 11 - NUEVA -->
-                    <div class="faq-item" onclick="toggleFAQ(this)">
-                        <div class="faq-pregunta px-4 py-3">
-                            <span>¿Cuánto cuesta el envío?</span>
-                            <i class="fas fa-chevron-down faq-icon"></i>
-                        </div>
-                        <div class="faq-respuesta px-4 pb-3">
-                            El costo de envío varía según tu ubicación y el peso del pedido. El costo se calcula automáticamente al ingresar tu dirección en el checkout. Ofrecemos envío gratis en compras superiores a $50.000.
-                        </div>
-                    </div>
-                    <!-- FAQ 12 - NUEVA -->
-                    <div class="faq-item" onclick="toggleFAQ(this)">
-                        <div class="faq-pregunta px-4 py-3">
-                            <span>¿Puedo cambiar mi contraseña?</span>
-                            <i class="fas fa-chevron-down faq-icon"></i>
-                        </div>
-                        <div class="faq-respuesta px-4 pb-3">
-                            Sí, puedes cambiar tu contraseña en cualquier momento desde tu perfil. Ve a "Configuración" y luego a "Seguridad". Allí encontrarás la opción para cambiar tu contraseña. También puedes solicitar un restablecimiento desde la página de inicio de sesión.
-                        </div>
-                    </div>
-                    <!-- FAQ 13 - NUEVA -->
-                    <div class="faq-item" onclick="toggleFAQ(this)">
-                        <div class="faq-pregunta px-4 py-3">
-                            <span>¿Dónde puedo ver mis pedidos anteriores?</span>
-                            <i class="fas fa-chevron-down faq-icon"></i>
-                        </div>
-                        <div class="faq-respuesta px-4 pb-3">
-                            Puedes ver todos tus pedidos anteriores en la sección "Mis compras" dentro de tu perfil. Allí encontrarás el historial completo de compras, el estado de cada pedido y los detalles de seguimiento.
-                        </div>
-                    </div>
-                    <!-- FAQ 14 - NUEVA -->
-                    <div class="faq-item" onclick="toggleFAQ(this)">
-                        <div class="faq-pregunta px-4 py-3">
-                            <span>¿Cómo funcionan los cupones de descuento?</span>
-                            <i class="fas fa-chevron-down faq-icon"></i>
-                        </div>
-                        <div class="faq-respuesta px-4 pb-3">
-                            Los cupones de descuento se pueden aplicar al momento de pagar en el carrito. Ingresa el código del cupón en el campo correspondiente y el descuento se aplicará automáticamente. Cada cupón tiene sus propias condiciones y vigencia.
-                        </div>
-                    </div>
-                    <!-- FAQ 15 - NUEVA -->
-                    <div class="faq-item" onclick="toggleFAQ(this)">
-                        <div class="faq-pregunta px-4 py-3">
-                            <span>¿Qué hago si olvidé mi contraseña?</span>
-                            <i class="fas fa-chevron-down faq-icon"></i>
-                        </div>
-                        <div class="faq-respuesta px-4 pb-3">
-                            Si olvidaste tu contraseña, ve a la página de inicio de sesión y haz clic en "¿Olvidaste tu contraseña?". Ingresa tu correo electrónico y recibirás un enlace para restablecer tu contraseña de forma segura.
-                        </div>
+
+                    <!-- BOTÓN VER MÁS -->
+                    <div class="text-center py-4 border-t border-gray-100">
+                        <button id="btn-ver-mas-faqs" onclick="toggleFAQs()" 
+                            class="text-purple-600 hover:text-purple-800 font-semibold transition flex items-center justify-center gap-2 mx-auto">
+                            <span id="btn-ver-mas-texto">Ver más preguntas</span>
+                            <i id="btn-ver-mas-icono" class="fas fa-chevron-down"></i>
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <!-- BUSCADOR Y GRABACIÓN -->
+            <!-- BUSCADOR (sin cambios) -->
             <div class="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-100 rounded-2xl p-6">
                 <label for="buscador-problema" class="block text-gray-700 font-semibold mb-2">¿No encontraste lo que buscabas? Describe tu problema:</label>
                 <div class="relative">
                     <input type="text" id="buscador-problema" placeholder="Ej: Mi pedido no llega o quiero cambiar mi tarjeta..." 
                         class="w-full pl-5 pr-36 py-3.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-700 shadow-sm transition">
-                    
-                    <!-- Botón de grabación de audio -->
                     <button id="btn-grabar-audio" class="absolute right-14 top-2 bg-red-500 hover:bg-red-600 text-white w-10 h-10 rounded-lg flex items-center justify-center transition hover:scale-105" title="Grabar audio">
                         <i class="fas fa-microphone"></i>
                     </button>
-                    
-                    <!-- Botón de enviar -->
                     <button onclick="buscarOIrAIChat()" class="absolute right-2 top-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white w-10 h-10 rounded-lg flex items-center justify-center hover:opacity-90 transition hover:scale-105">
                         <i class="fas fa-paper-plane"></i>
                     </button>
@@ -616,8 +649,7 @@
                 </div>
                 <p class="text-xs text-gray-500 mt-2"><i class="fas fa-robot text-purple-500"></i> Nuestro buscador filtrará las preguntas vigentes. Si presionas enviar, nuestra <strong>Asistente IA</strong> resolverá tu caso de inmediato.</p>
             </div>
-        </div>
-             
+        </div>        
     </main>
 
     <!-- SCRIPTS -->
